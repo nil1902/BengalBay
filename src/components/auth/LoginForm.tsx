@@ -58,8 +58,8 @@ const LoginForm = () => {
   };
 
   return (
-    <div className="flex justify-center items-center min-h-[calc(100vh-80px)] bg-gray-50 dark:bg-gray-900 py-12 px-4">
-      <Card className="w-full max-w-md bg-white dark:bg-gray-800">
+    <div className="flex justify-center items-center min-h-[calc(100vh-80px)] bg-gray-50 py-12 px-4">
+      <Card className="w-full max-w-md bg-white">
         <CardHeader className="space-y-1">
           <CardTitle className="text-2xl font-bold text-center">
             Login to Nil's Kitchen
@@ -92,7 +92,7 @@ const LoginForm = () => {
                 <button
                   type="button"
                   onClick={handleResetPassword}
-                  className="text-sm text-amber-600 hover:text-amber-800 dark:text-amber-400 dark:hover:text-amber-300"
+                  className="text-sm text-amber-600 hover:text-amber-800"
                 >
                   Forgot Password?
                 </button>
@@ -130,7 +130,7 @@ const LoginForm = () => {
             Don't have an account?{" "}
             <Link
               to="/register"
-              className="text-amber-600 hover:text-amber-800 dark:text-amber-400 dark:hover:text-amber-300 font-medium"
+              className="text-amber-600 hover:text-amber-800 font-medium"
             >
               Register here
             </Link>

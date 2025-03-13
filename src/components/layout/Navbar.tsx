@@ -14,7 +14,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import ThemeToggle from "@/components/theme/ThemeToggle";
+// Theme toggle removed
 import { useAuth } from "@/contexts/AuthContext";
 
 interface NavbarProps {
@@ -122,7 +122,7 @@ const Navbar = ({ cartItemCount = 0 }: NavbarProps) => {
 
         {/* Auth & Cart Buttons */}
         <div className="hidden md:flex items-center space-x-4">
-          <ThemeToggle />
+          {/* Theme toggle removed */}
           {isLoggedIn ? (
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
