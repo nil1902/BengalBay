@@ -10,7 +10,7 @@ interface HeroBannerProps {
 
 const HeroBanner = ({
   title = "Welcome to Nil's Kitchen",
-  subtitle = "Experience authentic flavors with our handcrafted dishes made from the freshest ingredients",
+  subtitle = "Experience authentic flavors with our handcrafted dishes made from the freshest ingredients.",
   imageUrl = "https://images.unsplash.com/photo-1555396273-367ea4eb4db5?w=1920&q=80",
 }: HeroBannerProps) => {
   return (
@@ -34,15 +34,14 @@ const HeroBanner = ({
         <div className="flex flex-col sm:flex-row gap-4">
           <Button
             size="lg"
-            className="bg-amber-600 hover:bg-amber-700 text-white"
+            className="bg-white/10 text-white hover:bg-white/30 hover:text-black"
             onClick={() => (window.location.href = "/reservations")}
           >
             Book a Table
           </Button>
           <Button
             size="lg"
-            variant="outline"
-            className="border-white text-white hover:bg-amber-600 hover:border-amber-600"
+            className="bg-white/10 text-white hover:bg-white/30 hover:text-black"
             onClick={() => (window.location.href = "/menu")}
           >
             Order Online <ArrowRight className="ml-2 h-4 w-4" />
