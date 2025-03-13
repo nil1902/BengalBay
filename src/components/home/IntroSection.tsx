@@ -34,7 +34,7 @@ const IntroSection = ({
           <div className="pt-4">
             <a
               href="/about"
-              className="text-amber-600 hover:text-amber-700 font-medium"
+              className="text-amber-600 hover:text-amber-700 font-medium inline-block"
             >
               Learn more about our team →
             </a>
@@ -49,7 +49,7 @@ const IntroSection = ({
           <div className="pt-4">
             <a
               href="/about"
-              className="text-amber-600 hover:text-amber-700 font-medium"
+              className="text-amber-600 hover:text-amber-700 font-medium inline-block"
             >
               Read our full story →
             </a>

@@ -9,8 +9,8 @@ import {
   Clock,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { Separator } from "@/components/ui/separator";
+import NewsletterForm from "@/components/home/NewsletterForm";
 
 const Footer = () => {
   return (
@@ -62,32 +62,50 @@ const Footer = () => {
             <h3 className="text-xl font-bold mb-4">Quick Links</h3>
             <ul className="space-y-2">
               <li>
-                <a href="#" className="hover:text-amber-400 transition-colors">
+                <a
+                  href="/menu"
+                  className="hover:text-amber-400 transition-colors"
+                >
                   Menu
                 </a>
               </li>
               <li>
-                <a href="#" className="hover:text-amber-400 transition-colors">
+                <a
+                  href="/reservations"
+                  className="hover:text-amber-400 transition-colors"
+                >
                   Reservations
                 </a>
               </li>
               <li>
-                <a href="#" className="hover:text-amber-400 transition-colors">
+                <a
+                  href="/about"
+                  className="hover:text-amber-400 transition-colors"
+                >
                   About Us
                 </a>
               </li>
               <li>
-                <a href="#" className="hover:text-amber-400 transition-colors">
+                <a
+                  href="/contact"
+                  className="hover:text-amber-400 transition-colors"
+                >
                   Contact
                 </a>
               </li>
               <li>
-                <a href="#" className="hover:text-amber-400 transition-colors">
+                <a
+                  href="/privacy-policy"
+                  className="hover:text-amber-400 transition-colors"
+                >
                   Privacy Policy
                 </a>
               </li>
               <li>
-                <a href="#" className="hover:text-amber-400 transition-colors">
+                <a
+                  href="/terms-of-service"
+                  className="hover:text-amber-400 transition-colors"
+                >
                   Terms of Service
                 </a>
               </li>
@@ -100,27 +118,30 @@ const Footer = () => {
             <p className="mb-4">
               Subscribe to our newsletter for special offers and updates.
             </p>
-            <div className="flex gap-2">
-              <Input
-                type="email"
-                placeholder="Your email"
-                className="bg-slate-800 border-slate-700 text-white"
-              />
-              <Button
-                variant="default"
-                className="bg-amber-500 hover:bg-amber-600"
-              >
-                Subscribe
-              </Button>
-            </div>
+            <NewsletterForm />
             <div className="flex gap-4 mt-6">
-              <a href="#" className="hover:text-amber-400 transition-colors">
+              <a
+                href="https://facebook.com"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="hover:text-amber-400 transition-colors"
+              >
                 <Facebook size={20} />
               </a>
-              <a href="#" className="hover:text-amber-400 transition-colors">
+              <a
+                href="https://instagram.com"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="hover:text-amber-400 transition-colors"
+              >
                 <Instagram size={20} />
               </a>
-              <a href="#" className="hover:text-amber-400 transition-colors">
+              <a
+                href="https://twitter.com"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="hover:text-amber-400 transition-colors"
+              >
                 <Twitter size={20} />
               </a>
             </div>
@@ -136,13 +157,13 @@ const Footer = () => {
           </p>
           <div className="flex gap-4 mt-4 md:mt-0">
             <a
-              href="#"
+              href="/privacy-policy"
               className="text-gray-400 hover:text-amber-400 text-sm transition-colors"
             >
               Privacy Policy
             </a>
             <a
-              href="#"
+              href="/terms-of-service"
               className="text-gray-400 hover:text-amber-400 text-sm transition-colors"
             >
               Terms of Service

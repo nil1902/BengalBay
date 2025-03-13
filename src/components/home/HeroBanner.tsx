@@ -35,13 +35,15 @@ const HeroBanner = ({
           <Button
             size="lg"
             className="bg-amber-600 hover:bg-amber-700 text-white"
+            onClick={() => (window.location.href = "/reservations")}
           >
             Book a Table
           </Button>
           <Button
             size="lg"
             variant="outline"
-            className="border-white text-white hover:bg-white/10 hover:text-white"
+            className="border-white text-white hover:bg-amber-600 hover:border-amber-600"
+            onClick={() => (window.location.href = "/menu")}
           >
             Order Online <ArrowRight className="ml-2 h-4 w-4" />
           </Button>

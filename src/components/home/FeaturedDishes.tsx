@@ -179,7 +179,10 @@ const FeaturedDishes = ({
         </div>
 
         <div className="mt-10 text-center">
-          <Button className="bg-primary text-white hover:bg-primary/90">
+          <Button
+            className="bg-amber-600 text-white hover:bg-amber-700"
+            onClick={() => (window.location.href = "/menu")}
+          >
             View Full Menu
           </Button>
         </div>

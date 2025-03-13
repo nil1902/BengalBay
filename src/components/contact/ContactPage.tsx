@@ -20,18 +20,52 @@ const ContactPage = () => {
   const [message, setMessage] = useState("");
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [isFormValid, setIsFormValid] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [error, setError] = useState("");
 
   // Check if form is valid whenever inputs change
   React.useEffect(() => {
     setIsFormValid(!!name && !!email && !!subject && !!message);
   }, [name, email, subject, message]);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (isFormValid) {
-      // In a real app, you would submit this data to your backend
-      console.log({ name, email, subject, message });
-      setIsSubmitted(true);
+      try {
+        setIsSubmitting(true);
+        setError("");
+
+        // Send form data to formsubmit.co service
+        const response = await fetch(
+          "https://formsubmit.co/ajax/nilimeshpal4@gmail.com",
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              Accept: "application/json",
+            },
+            body: JSON.stringify({
+              name,
+              email,
+              subject,
+              message,
+            }),
+          },
+        );
+
+        if (!response.ok) {
+          throw new Error("Failed to submit form. Please try again later.");
+        }
+
+        setIsSubmitted(true);
+      } catch (err) {
+        console.error("Form submission error:", err);
+        setError(
+          err instanceof Error ? err.message : "An unexpected error occurred",
+        );
+      } finally {
+        setIsSubmitting(false);
+      }
     }
   };
 
@@ -65,6 +99,11 @@ const ContactPage = () => {
             <h2 className="text-3xl font-bold text-gray-900 mb-6">
               Send Us a Message
             </h2>
+            {error && (
+              <div className="mb-6 p-4 bg-red-50 text-red-700 rounded-md border border-red-200">
+                {error}
+              </div>
+            )}
             <form onSubmit={handleSubmit} className="space-y-6">
               <div className="space-y-2">
                 <Label htmlFor="name">Your Name</Label>
@@ -115,10 +154,10 @@ const ContactPage = () => {
               <Button
                 type="submit"
                 className="w-full bg-amber-600 hover:bg-amber-700 text-white"
-                disabled={!isFormValid}
+                disabled={!isFormValid || isSubmitting}
               >
                 <Send className="mr-2 h-4 w-4" />
-                Send Message
+                {isSubmitting ? "Sending..." : "Send Message"}
               </Button>
             </form>
           </div>

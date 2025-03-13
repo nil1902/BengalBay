@@ -34,7 +34,7 @@ const galleryImages: GalleryImage[] = [
   },
   {
     id: "f4",
-    src: "https://images.unsplash.com/photo-1601303516361-9e7a1e01a7ea?w=1200&q=80",
+    src: "https://imgs.search.brave.com/Z0ZZkxbZHUGhaUD7lfPJvSVCH0SdCvlM7C5SlguDr7Y/rs:fit:860:0:0:0/g:ce/aHR0cHM6Ly9tZWRp/YS5nZXR0eWltYWdl/cy5jb20vaWQvMTMz/NzIxMzMwOS9waG90/by9ndWxhYi1qYW11/bi5qcGc_cz02MTJ4/NjEyJnc9MCZrPTIw/JmM9TnpESDlPbTIz/aFp5RnNXNkt0NVo1/VUsyT19WUTdhaG80/SDB4b0hBRzg2TT0",
     alt: "Gulab Jamun Dessert",
     category: "food",
   },
@@ -48,6 +48,12 @@ const galleryImages: GalleryImage[] = [
     id: "f6",
     src: "https://images.unsplash.com/photo-1626508035297-0cd27c397d67?w=1200&q=80",
     alt: "Fish Curry",
+    category: "food",
+  },
+  {
+    id: "f7",
+    src: "https://imgs.search.brave.com/36UiHPC4R-fCsU2NXqJIz-9BghaENOxDjpepP76LTSU/rs:fit:860:0:0:0/g:ce/aHR0cHM6Ly90My5m/dGNkbi5uZXQvanBn/LzA2LzA4Lzg0LzI0/LzM2MF9GXzYwODg0/MjQxM19oZFlhZHA2/dVNDN2M3cHE2TEpl/dzlzOGdQblJTZ2ps/bi5qcGc",
+    alt: "Chicken Biriyani",
     category: "food",
   },
 

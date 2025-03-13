@@ -35,6 +35,18 @@ function App() {
                 <Route path="/login" element={<Login />} />
                 <Route path="/register" element={<Register />} />
                 <Route path="/profile" element={<Profile />} />
+                <Route
+                  path="/privacy-policy"
+                  element={React.createElement(
+                    React.lazy(() => import("./pages/privacy-policy")),
+                  )}
+                />
+                <Route
+                  path="/terms-of-service"
+                  element={React.createElement(
+                    React.lazy(() => import("./pages/terms-of-service")),
+                  )}
+                />
                 {import.meta.env.VITE_TEMPO === "true" && (
                   <Route path="/tempobook/*" />
                 )}
