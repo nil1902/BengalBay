@@ -26,12 +26,12 @@ const DishCard = ({
   id = "1",
   name = "Spicy Chicken Pasta",
   description = "Tender chicken pieces in a spicy tomato sauce with fresh herbs and parmesan cheese.",
-  price = 14.99,
+  price = 499, // Price in INR
   image = "https://images.unsplash.com/photo-1563379926898-05f4575a45d8?w=500&q=80",
   rating = 4.5,
   category = "Pasta",
   isSpecial = false,
-  onAddToCart = () => {},
+  onAddToCart = () => console.log("Add to cart clicked"), // Default handler
   onFavorite = () => {},
 }: DishCardProps) => {
   return (
@@ -80,12 +80,13 @@ const DishCard = ({
 
       <CardFooter className="flex items-center justify-between p-4 pt-0">
         <span className="text-lg font-bold text-gray-900">
-          ${price.toFixed(2)}
+          ₹{price.toFixed(2)}
         </span>
         <Button
           size="sm"
           className="bg-primary text-white hover:bg-primary/90"
           onClick={() => onAddToCart(id)}
+          aria-label="Add to cart"
         >
           <ShoppingCart className="mr-2 h-4 w-4" />
           Add to Cart

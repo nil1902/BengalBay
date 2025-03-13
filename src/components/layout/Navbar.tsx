@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Link, useLocation } from "react-router-dom";
-import { Menu, X, User, ShoppingCart, LogOut } from "lucide-react";
+import { Menu, X, User, LogOut } from "lucide-react";
+import CartDrawer from "../cart/CartDrawer";
 import { Button } from "@/components/ui/button";
 import {
   NavigationMenu,
@@ -178,21 +179,7 @@ const Navbar = ({ cartItemCount = 0 }: NavbarProps) => {
             </div>
           )}
 
-          <Button
-            variant="ghost"
-            size="icon"
-            className="relative hover:bg-amber-100 hover:text-amber-600"
-            asChild
-          >
-            <Link to="/cart">
-              <ShoppingCart className="h-5 w-5" />
-              {cartItemCount > 0 && (
-                <span className="absolute -top-2 -right-2 bg-amber-600 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
-                  {cartItemCount}
-                </span>
-              )}
-            </Link>
-          </Button>
+          <CartDrawer />
         </div>
 
         {/* Mobile Menu Button */}
@@ -309,21 +296,19 @@ const Navbar = ({ cartItemCount = 0 }: NavbarProps) => {
                 </div>
               )}
 
-              <Link
-                to="/cart"
-                className="flex items-center justify-between py-3 mt-4 border-t border-gray-100 text-gray-700 hover:text-amber-600"
-                onClick={toggleMobileMenu}
+              <button
+                className="flex items-center justify-between py-3 mt-4 border-t border-gray-100 text-gray-700 hover:text-amber-600 w-full"
+                onClick={() => {
+                  toggleMobileMenu();
+                  document.querySelector('[aria-label="Open cart"]')?.click();
+                }}
               >
                 <span className="flex items-center">
-                  <ShoppingCart className="mr-2 h-5 w-5" />
-                  Cart
+                  <CartDrawer>
+                    <span className="flex items-center">Cart</span>
+                  </CartDrawer>
                 </span>
-                {cartItemCount > 0 && (
-                  <span className="bg-amber-600 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
-                    {cartItemCount}
-                  </span>
-                )}
-              </Link>
+              </button>
             </div>
           </div>
         </div>

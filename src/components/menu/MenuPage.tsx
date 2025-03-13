@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { useCart } from "../cart/CartContext";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import DishCard from "./DishCard";
 import { Input } from "@/components/ui/input";
@@ -21,9 +22,13 @@ const MenuPage = () => {
     return matchesSearch && dish.type === activeTab;
   });
 
+  const { addToCart } = useCart();
+
   const handleAddToCart = (id: string) => {
-    console.log(`Added dish ${id} to cart`);
-    // Implement cart functionality here
+    const dish = menuItems.find((item) => item.id === id);
+    if (dish) {
+      addToCart(dish);
+    }
   };
 
   const handleFavorite = (id: string) => {
