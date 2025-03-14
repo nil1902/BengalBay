@@ -21,6 +21,8 @@ import {
   DialogTitle,
   DialogDescription,
 } from "@/components/ui/dialog";
+import { collection, addDoc, serverTimestamp } from "firebase/firestore";
+import { db } from "@/lib/firebase";
 
 const CheckoutPage = () => {
   const { currentUser } = useAuth();
@@ -30,8 +32,9 @@ const CheckoutPage = () => {
   const [isOrderComplete, setIsOrderComplete] = useState(false);
   const [orderId, setOrderId] = useState("");
   const [isAddressFormOpen, setIsAddressFormOpen] = useState(false);
+  const [isProcessing, setIsProcessing] = useState(false);
 
-  // Mock address data
+  // Address data with user info if available
   const [address, setAddress] = useState<AddressData>({
     name: currentUser?.displayName || "Guest User",
     phone: "9876543210",
@@ -51,32 +54,63 @@ const CheckoutPage = () => {
     }
   }, [currentUser, navigate]);
 
-  const handlePaymentComplete = () => {
-    // Generate a random order ID
-    const randomOrderId = `ORD-${Math.floor(Math.random() * 1000000)}`;
-    setOrderId(randomOrderId);
-    setIsOrderComplete(true);
+  // If cart is empty, redirect to menu
+  useEffect(() => {
+    if (cartItems.length === 0) {
+      navigate("/menu");
+    }
+  }, [cartItems, navigate]);
 
-    // Save order to localStorage for history
+  const handlePaymentComplete = async () => {
+    if (isProcessing) return;
+    setIsProcessing(true);
+
     try {
+      // Generate a random order ID
+      const randomOrderId = `ORD-${Math.floor(Math.random() * 1000000)}`;
       const orderDate = new Date().toISOString();
-      const newOrder = {
+      const totalAmount = cartTotal + cartTotal * 0.05;
+
+      // Create order object
+      const orderData = {
         id: randomOrderId,
         date: orderDate,
         items: cartItems,
-        total: cartTotal + cartTotal * 0.05,
+        total: totalAmount,
         status: "Processing",
+        userId: currentUser?.uid,
+        userEmail: currentUser?.email,
+        userName: currentUser?.displayName || address.name,
+        shippingAddress: address,
+        timestamp: serverTimestamp(),
       };
 
-      // Get existing orders or initialize empty array
-      const existingOrders = localStorage.getItem("nilsKitchenOrders");
-      const orders = existingOrders ? JSON.parse(existingOrders) : [];
+      // Save to Firestore
+      if (currentUser) {
+        const docRef = await addDoc(collection(db, "orders"), orderData);
+        console.log("Order saved with ID: ", docRef.id);
+        setOrderId(randomOrderId);
 
-      // Add new order and save back to localStorage
-      orders.unshift(newOrder);
-      localStorage.setItem("nilsKitchenOrders", JSON.stringify(orders));
+        // Also save to user-specific localStorage as backup
+        const userOrdersKey = `orders_${currentUser.uid}`;
+        const existingOrders = localStorage.getItem(userOrdersKey);
+        const orders = existingOrders ? JSON.parse(existingOrders) : [];
+        orders.unshift(orderData);
+        localStorage.setItem(userOrdersKey, JSON.stringify(orders));
+
+        // Send confirmation email (mock)
+        console.log(
+          `Sending confirmation email to ${currentUser.email} and nilimeshpal4@gmail.com`,
+        );
+
+        // Show confirmation dialog
+        setIsOrderComplete(true);
+      }
     } catch (error) {
-      console.error("Failed to save order to localStorage", error);
+      console.error("Failed to process order:", error);
+      alert("There was an error processing your order. Please try again.");
+    } finally {
+      setIsProcessing(false);
     }
   };
 
@@ -84,13 +118,6 @@ const CheckoutPage = () => {
     setAddress(newAddress);
     setIsAddressFormOpen(false);
   };
-
-  // If cart is empty, redirect to menu
-  useEffect(() => {
-    if (cartItems.length === 0) {
-      navigate("/menu");
-    }
-  }, [cartItems, navigate]);
 
   return (
     <div className="container mx-auto py-10 px-4">
@@ -161,18 +188,31 @@ const CheckoutPage = () => {
         </div>
       </div>
 
-      <Tabs value={activeTab} onValueChange={setActiveTab}>
-        <TabsList className="grid w-full grid-cols-1 mb-8">
-          <TabsTrigger value="payment" className="flex items-center gap-2">
-            <CreditCard className="h-4 w-4" />
-            Payment Options
-          </TabsTrigger>
-        </TabsList>
+      {cartItems.length > 0 ? (
+        <Tabs value={activeTab} onValueChange={setActiveTab}>
+          <TabsList className="grid w-full grid-cols-1 mb-8">
+            <TabsTrigger value="payment" className="flex items-center gap-2">
+              <CreditCard className="h-4 w-4" />
+              Payment Options
+            </TabsTrigger>
+          </TabsList>
 
-        <TabsContent value="payment">
-          <PaymentOptions onPaymentComplete={handlePaymentComplete} />
-        </TabsContent>
-      </Tabs>
+          <TabsContent value="payment">
+            <PaymentOptions onPaymentComplete={handlePaymentComplete} />
+          </TabsContent>
+        </Tabs>
+      ) : (
+        <div className="text-center py-8">
+          <ShoppingCart className="h-12 w-12 mx-auto text-gray-400 mb-4" />
+          <p className="text-gray-500">Your cart is empty</p>
+          <Button
+            className="mt-4 bg-amber-600 hover:bg-amber-700 text-white"
+            onClick={() => navigate("/menu")}
+          >
+            Browse Menu
+          </Button>
+        </div>
+      )}
 
       {/* Address Form Dialog */}
       <Dialog open={isAddressFormOpen} onOpenChange={setIsAddressFormOpen}>
@@ -200,17 +240,19 @@ const CheckoutPage = () => {
             </div>
             <div className="text-center space-y-3">
               <p className="font-medium">
-                Thank you for your order, {currentUser?.displayName || "Guest"}!
+                Thank you for your order,{" "}
+                {currentUser?.displayName || address.name}!
               </p>
               <div className="bg-gray-50 p-4 rounded-md">
                 <p className="font-medium">Order Details:</p>
                 <p>Order ID: {orderId}</p>
                 <p>Items: {cartItems.length}</p>
-                <p>Total: ₹{cartTotal.toFixed(2)}</p>
+                <p>Total: ₹{(cartTotal + cartTotal * 0.05).toFixed(2)}</p>
               </div>
               <p className="text-sm text-gray-500">
-                A confirmation email has been sent to {currentUser?.email}. You
-                can track your order in the My Orders section of your profile.
+                A confirmation email has been sent to {currentUser?.email} and
+                nilimeshpal4@gmail.com. You can track your order in the My
+                Orders section of your profile.
               </p>
             </div>
           </div>

@@ -1,10 +1,12 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Calendar, Users, Clock, MapPin, ExternalLink } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import { collection, query, where, getDocs, orderBy } from "firebase/firestore";
+import { db } from "@/lib/firebase";
 
 interface Booking {
   id: string;
@@ -13,52 +15,65 @@ interface Booking {
   guests: number;
   specialRequests?: string;
   status: "Upcoming" | "Completed" | "Cancelled";
+  userId?: string;
+  userEmail?: string;
+  name?: string;
+  phone?: string;
 }
-
-// Mock bookings data - in a real app, this would come from a database
-const mockBookings: Booking[] = [
-  {
-    id: "BKG-123456",
-    date: "2023-06-20",
-    time: "19:30",
-    guests: 4,
-    specialRequests: "Window seating preferred",
-    status: "Upcoming",
-  },
-  {
-    id: "BKG-789012",
-    date: "2023-06-15",
-    time: "20:00",
-    guests: 2,
-    status: "Completed",
-  },
-  {
-    id: "BKG-345678",
-    date: "2023-06-10",
-    time: "18:30",
-    guests: 6,
-    specialRequests: "Birthday celebration",
-    status: "Completed",
-  },
-];
 
 const BookingHistory = () => {
   const { currentUser } = useAuth();
   const navigate = useNavigate();
-  const [bookings, setBookings] = React.useState<Booking[]>(mockBookings);
+  const [bookings, setBookings] = useState<Booking[]>([]);
+  const [loading, setLoading] = useState(true);
 
-  // Get bookings from localStorage if available
-  React.useEffect(() => {
-    const storedBookings = localStorage.getItem("nilsKitchenBookings");
-    if (storedBookings) {
-      try {
-        const parsedBookings = JSON.parse(storedBookings);
-        setBookings([...parsedBookings, ...bookings]);
-      } catch (error) {
-        console.error("Failed to parse bookings from localStorage", error);
+  // Fetch bookings from Firestore based on current user
+  useEffect(() => {
+    const fetchBookings = async () => {
+      if (!currentUser) {
+        setLoading(false);
+        return;
       }
-    }
-  }, []);
+
+      try {
+        setLoading(true);
+        // Query bookings collection for the current user
+        const bookingsRef = collection(db, "bookings");
+        const q = query(
+          bookingsRef,
+          where("userId", "==", currentUser.uid),
+          orderBy("date", "desc"),
+        );
+
+        const querySnapshot = await getDocs(q);
+        const userBookings: Booking[] = [];
+
+        querySnapshot.forEach((doc) => {
+          userBookings.push({ id: doc.id, ...doc.data() } as Booking);
+        });
+
+        setBookings(userBookings);
+      } catch (error) {
+        console.error("Error fetching bookings:", error);
+        // Fallback to localStorage if Firestore fails
+        const storedBookings = localStorage.getItem(
+          `bookings_${currentUser.uid}`,
+        );
+        if (storedBookings) {
+          try {
+            const parsedBookings = JSON.parse(storedBookings);
+            setBookings(parsedBookings);
+          } catch (err) {
+            console.error("Failed to parse bookings from localStorage", err);
+          }
+        }
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchBookings();
+  }, [currentUser]);
 
   const getStatusColor = (status: Booking["status"]) => {
     switch (status) {
@@ -74,25 +89,51 @@ const BookingHistory = () => {
   };
 
   const handleModifyBooking = (id: string) => {
-    // In a real app, this would navigate to a booking modification page
+    // Navigate to booking modification page
     navigate(`/reservations?modify=${id}`);
   };
 
-  const handleCancelBooking = (id: string) => {
-    // In a real app, this would call an API to cancel the booking
-    setBookings(
-      bookings.map((booking) =>
-        booking.id === id
-          ? { ...booking, status: "Cancelled" as const }
-          : booking,
-      ),
-    );
+  const handleCancelBooking = async (id: string) => {
+    try {
+      // Update booking status in Firestore (in a real app)
+      // For now, just update the local state
+      setBookings(
+        bookings.map((booking) =>
+          booking.id === id
+            ? { ...booking, status: "Cancelled" as const }
+            : booking,
+        ),
+      );
+
+      // Also update in localStorage as fallback
+      if (currentUser) {
+        const updatedBookings = bookings.map((booking) =>
+          booking.id === id
+            ? { ...booking, status: "Cancelled" as const }
+            : booking,
+        );
+        localStorage.setItem(
+          `bookings_${currentUser.uid}`,
+          JSON.stringify(updatedBookings),
+        );
+      }
+    } catch (error) {
+      console.error("Error cancelling booking:", error);
+    }
   };
 
   const handleBookAgain = (booking: Booking) => {
-    // In a real app, this would pre-fill the reservation form
+    // Pre-fill the reservation form
     navigate(`/reservations?guests=${booking.guests}&time=${booking.time}`);
   };
+
+  if (loading) {
+    return (
+      <div className="container mx-auto py-10 px-4 text-center">
+        <p>Loading your bookings...</p>
+      </div>
+    );
+  }
 
   return (
     <div className="container mx-auto py-10 px-4">

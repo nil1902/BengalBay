@@ -1,10 +1,12 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Package, ExternalLink } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import { collection, query, where, getDocs, orderBy } from "firebase/firestore";
+import { db } from "@/lib/firebase";
 
 interface OrderItem {
   id: string;
@@ -20,93 +22,61 @@ interface Order {
   items: OrderItem[];
   total: number;
   status: "Delivered" | "Processing" | "Shipped" | "Cancelled";
+  userId?: string;
+  userEmail?: string;
 }
-
-// Mock orders data - in a real app, this would come from a database
-const mockOrders: Order[] = [
-  {
-    id: "ORD-123456",
-    date: "2023-06-15T10:30:00",
-    items: [
-      {
-        id: "v2",
-        name: "Vegetable Biryani",
-        quantity: 1,
-        price: 399,
-        image:
-          "https://images.unsplash.com/photo-1589302168068-964664d93dc0?w=500&q=80",
-      },
-      {
-        id: "br1",
-        name: "Garlic Naan",
-        quantity: 2,
-        price: 99,
-        image:
-          "https://images.unsplash.com/photo-1600628421055-4d30de868b8f?w=500&q=80",
-      },
-    ],
-    total: 597,
-    status: "Delivered",
-  },
-  {
-    id: "ORD-789012",
-    date: "2023-06-10T19:45:00",
-    items: [
-      {
-        id: "nv1",
-        name: "Butter Chicken",
-        quantity: 1,
-        price: 549,
-        image:
-          "https://images.unsplash.com/photo-1603894584373-5ac82b2ae398?w=500&q=80",
-      },
-      {
-        id: "d1",
-        name: "Mango Lassi",
-        quantity: 2,
-        price: 149,
-        image:
-          "https://images.unsplash.com/photo-1527661591475-527312dd65f5?w=500&q=80",
-      },
-    ],
-    total: 847,
-    status: "Delivered",
-  },
-  {
-    id: "ORD-345678",
-    date: "2023-06-05T13:15:00",
-    items: [
-      {
-        id: "ds1",
-        name: "Gulab Jamun",
-        quantity: 1,
-        price: 149,
-        image:
-          "https://images.unsplash.com/photo-1601303516361-9e7a1e01a7ea?w=500&q=80",
-      },
-    ],
-    total: 149,
-    status: "Processing",
-  },
-];
 
 const OrderHistory = () => {
   const { currentUser } = useAuth();
   const navigate = useNavigate();
-  const [orders, setOrders] = React.useState<Order[]>(mockOrders);
+  const [orders, setOrders] = useState<Order[]>([]);
+  const [loading, setLoading] = useState(true);
 
-  // Get orders from localStorage if available
-  React.useEffect(() => {
-    const storedOrders = localStorage.getItem("nilsKitchenOrders");
-    if (storedOrders) {
-      try {
-        const parsedOrders = JSON.parse(storedOrders);
-        setOrders([...parsedOrders, ...orders]);
-      } catch (error) {
-        console.error("Failed to parse orders from localStorage", error);
+  // Fetch orders from Firestore based on current user
+  useEffect(() => {
+    const fetchOrders = async () => {
+      if (!currentUser) {
+        setLoading(false);
+        return;
       }
-    }
-  }, []);
+
+      try {
+        setLoading(true);
+        // Query orders collection for the current user
+        const ordersRef = collection(db, "orders");
+        const q = query(
+          ordersRef,
+          where("userId", "==", currentUser.uid),
+          orderBy("date", "desc"),
+        );
+
+        const querySnapshot = await getDocs(q);
+        const userOrders: Order[] = [];
+
+        querySnapshot.forEach((doc) => {
+          userOrders.push({ id: doc.id, ...doc.data() } as Order);
+        });
+
+        setOrders(userOrders);
+      } catch (error) {
+        console.error("Error fetching orders:", error);
+        // Fallback to localStorage if Firestore fails
+        const storedOrders = localStorage.getItem(`orders_${currentUser.uid}`);
+        if (storedOrders) {
+          try {
+            const parsedOrders = JSON.parse(storedOrders);
+            setOrders(parsedOrders);
+          } catch (err) {
+            console.error("Failed to parse orders from localStorage", err);
+          }
+        }
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchOrders();
+  }, [currentUser]);
 
   const getStatusColor = (status: Order["status"]) => {
     switch (status) {
@@ -122,6 +92,14 @@ const OrderHistory = () => {
         return "bg-gray-100 text-gray-800";
     }
   };
+
+  if (loading) {
+    return (
+      <div className="container mx-auto py-10 px-4 text-center">
+        <p>Loading your orders...</p>
+      </div>
+    );
+  }
 
   return (
     <div className="container mx-auto py-10 px-4">

@@ -10,6 +10,7 @@ import CardPaymentForm from "./CardPaymentForm";
 import NetBankingForm from "./NetBankingForm";
 import EmiPaymentForm from "./EmiPaymentForm";
 import CodPaymentForm from "./CodPaymentForm";
+import { useNavigate } from "react-router-dom";
 
 interface PaymentOptionsProps {
   onPaymentComplete: () => void;
@@ -22,6 +23,7 @@ const PaymentOptions: React.FC<PaymentOptionsProps> = ({
   const [isProcessing, setIsProcessing] = useState<boolean>(false);
   const { cartTotal, cartItems } = useCart();
   const { currentUser } = useAuth();
+  const navigate = useNavigate();
 
   // Mock countdown timer
   const [countdown, setCountdown] = useState<{
@@ -51,6 +53,11 @@ const PaymentOptions: React.FC<PaymentOptionsProps> = ({
   }, []);
 
   const handlePaymentSubmit = () => {
+    if (cartItems.length === 0) {
+      navigate("/menu");
+      return;
+    }
+
     setIsProcessing(true);
 
     // Simulate payment processing
@@ -69,6 +76,15 @@ const PaymentOptions: React.FC<PaymentOptionsProps> = ({
   const totalPayable = cartTotal + tax;
   const protectFee = 9;
   const grandTotal = totalPayable + protectFee;
+
+  const handleCheckout = () => {
+    if (!currentUser) {
+      navigate("/login");
+    } else {
+      // Proceed to checkout
+      navigate("/checkout");
+    }
+  };
 
   // Render the appropriate payment form based on selected method
   const renderPaymentForm = () => {

@@ -33,6 +33,9 @@ import {
   DialogTitle,
   DialogDescription,
 } from "@/components/ui/dialog";
+import { useAuth } from "@/contexts/AuthContext";
+import { collection, addDoc } from "firebase/firestore";
+import { db } from "@/lib/firebase";
 
 const timeSlots = [
   "11:00 AM",
@@ -55,6 +58,7 @@ const timeSlots = [
 ];
 
 const ReservationPage = () => {
+  const { currentUser } = useAuth();
   const [date, setDate] = useState<Date | undefined>(undefined);
   const [time, setTime] = useState<string>("");
   const [guests, setGuests] = useState<string>("2");
@@ -72,20 +76,67 @@ const ReservationPage = () => {
     );
   }, [date, time, guests, name, email, phone]);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (isFormValid) {
-      // In a real app, you would submit this data to your backend
-      console.log({
-        date,
-        time,
-        guests,
-        name,
-        email,
-        phone,
-        specialRequests,
-      });
-      setIsConfirmationOpen(true);
+      try {
+        // Create booking object
+        const bookingData = {
+          id: `BKG-${Math.floor(Math.random() * 1000000)}`,
+          date: date ? date.toISOString() : new Date().toISOString(),
+          time,
+          guests: parseInt(guests),
+          name,
+          email,
+          phone,
+          specialRequests,
+          status: "Upcoming",
+          userId: currentUser?.uid,
+          userEmail: email,
+          timestamp: new Date().toISOString(),
+        };
+
+        // Save to Firestore if user is logged in
+        if (currentUser) {
+          try {
+            const docRef = await addDoc(
+              collection(db, "bookings"),
+              bookingData,
+            );
+            console.log("Booking saved with ID: ", docRef.id);
+
+            // Also save to user-specific localStorage as backup
+            const userBookingsKey = `bookings_${currentUser.uid}`;
+            const existingBookings = localStorage.getItem(userBookingsKey);
+            const bookings = existingBookings
+              ? JSON.parse(existingBookings)
+              : [];
+            bookings.unshift(bookingData);
+            localStorage.setItem(userBookingsKey, JSON.stringify(bookings));
+          } catch (error) {
+            console.error("Error saving to Firestore:", error);
+            // Fallback to localStorage
+            const userBookingsKey = `bookings_${currentUser.uid}`;
+            const existingBookings = localStorage.getItem(userBookingsKey);
+            const bookings = existingBookings
+              ? JSON.parse(existingBookings)
+              : [];
+            bookings.unshift(bookingData);
+            localStorage.setItem(userBookingsKey, JSON.stringify(bookings));
+          }
+        }
+
+        // Send confirmation email (mock)
+        console.log(
+          `Sending confirmation email to ${email} and nilimeshpal4@gmail.com`,
+        );
+
+        // Show confirmation dialog
+        setIsConfirmationOpen(true);
+      } catch (error) {
+        console.error("Failed to process booking:", error);
+        alert("There was an error processing your booking. Please try again.");
+      }
     }
   };
 

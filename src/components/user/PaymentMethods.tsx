@@ -2,8 +2,10 @@ import React from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { CreditCard, Plus } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 
 const PaymentMethods = () => {
+  const navigate = useNavigate();
   return (
     <div className="container mx-auto py-10 px-4">
       <h1 className="text-3xl font-bold mb-6">Payment Methods</h1>
@@ -100,9 +102,12 @@ const PaymentMethods = () => {
                     Bank Account: 1256545835
                   </p>
                 </div>
-                <Button className="bg-amber-600 hover:bg-amber-700 text-white">
+                <Button
+                  className="bg-amber-600 hover:bg-amber-700 text-white"
+                  onClick={() => navigate("/checkout")}
+                >
                   <Plus className="mr-2 h-4 w-4" />
-                  Add Payment Method
+                  Make Payment
                 </Button>
               </div>
             </div>
