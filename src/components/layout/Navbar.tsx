@@ -68,9 +68,11 @@ const Navbar = ({ cartItemCount = 0 }: NavbarProps) => {
       <div className="container mx-auto px-4 h-full flex items-center justify-between">
         {/* Logo */}
         <Link to="/" className="flex items-center">
-          <span className="text-2xl font-bold text-amber-600 transition-colors hover:text-amber-700">
-            Nil's Kitchen
-          </span>
+          <img
+            src="/assets/images/logo/nils-kitchen-logo.svg"
+            alt="Nil's Kitchen Logo"
+            className="h-10 w-auto"
+          />
         </Link>
 
         {/* Desktop Navigation */}

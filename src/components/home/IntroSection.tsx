@@ -13,8 +13,8 @@ const IntroSection = ({
   title = "Welcome to Nil's Kitchen",
   description = "Experience the finest culinary delights in a warm, inviting atmosphere. Our passion for exceptional food and service creates memorable dining experiences for all our guests.",
   chefName = "Chef Nilesh Kumar",
-  chefDescription = "With over 15 years of culinary expertise, Chef Nilesh brings his unique vision and passion to every dish, combining traditional techniques with innovative flavors.",
-  restaurantHistory = "Established in 2010, Nil's Kitchen began as a small family restaurant and has grown into one of the city's most beloved dining destinations, known for our commitment to quality ingredients and authentic flavors.",
+  chefDescription = "With over 5 years of culinary expertise, Chef Nilesh brings his unique vision and passion to every dish, combining traditional techniques with innovative flavors.",
+  restaurantHistory = "Established in 2020, Nil's Kitchen began as a small family restaurant and has grown into one of the city's most beloved dining destinations, known for our commitment to quality ingredients and authentic flavors.",
 }: IntroSectionProps) => {
   return (
     <section className="w-full max-w-7xl mx-auto py-16 px-4 sm:px-6 lg:px-8 bg-white">
@@ -28,8 +28,20 @@ const IntroSection = ({
       <Separator className="my-8" />
 
       <div className="grid md:grid-cols-2 gap-12 items-center">
-        <div className="space-y-6">
-          <h3 className="text-2xl font-semibold text-gray-900">{chefName}</h3>
+        <div className="space-y-5 bg-purple-100/20 text-white p-8 rounded-xl border border-emerald-200/40">
+          <h3 className="text-2xl font-semibold text-gray-900">
+            {" "}
+            <div className="flex items-center space-x-3">
+              <img
+                src="https://img.icons8.com/?size=100&id=23288&format=png"
+                alt="Chef Icon"
+                className="w-6 h-6 object-contain"
+              />
+              <span className="text-xxl font-semibold text-gray-800">
+                {chefName}
+              </span>
+            </div>
+          </h3>
           <p className="text-gray-600">{chefDescription}</p>
           <div className="pt-4">
             <a
@@ -41,9 +53,18 @@ const IntroSection = ({
           </div>
         </div>
 
-        <div className="bg-amber-50 p-8 rounded-lg border border-amber-100">
+        <div className="bg-purple-100/20 text-white p-8 rounded-xl border border-emerald-200/40">
           <h3 className="text-2xl font-semibold text-gray-900 mb-4">
-            Our Story
+            <div className="flex items-center space-x-3">
+              <img
+                src="https://img.icons8.com/?size=100&id=7xE1Vu0MCgzW&format=png"
+                alt="Story Book Icon"
+                className="w-8 h-8 object-contain"
+              />
+              <span className="text-xxl font-semibold text-gray-800">
+                Our Story
+              </span>
+            </div>
           </h3>
           <p className="text-gray-600">{restaurantHistory}</p>
           <div className="pt-4">

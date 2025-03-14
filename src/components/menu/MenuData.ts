@@ -50,7 +50,7 @@ export const menuItems: MenuItem[] = [
     description: "Creamy black lentils slow-cooked with butter and spices",
     price: 349,
     image:
-      "https://images.unsplash.com/photo-1546833998-877b37c2e5c6?w=500&q=80",
+      "https://imgs.search.brave.com/1et60XQxwSWxFjrzWrDZi8h3d6ydjNC6NRlytpil_wo/rs:fit:860:0:0:0/g:ce/aHR0cHM6Ly9pbWcu/ZnJlZXBpay5jb20v/cHJlbWl1bS1waG90/by9kYWwtbWFraGFu/aS13aXRoLXdob2xl/LXNwaWNlcy1nYXJu/aXNoXzExMTQ3MTAt/MjUzMTM0LmpwZz9z/ZW10PWFpc19oeWJy/aWQ",
     rating: 4.6,
     category: "Main Course",
     type: "veg",
@@ -75,11 +75,11 @@ export const menuItems: MenuItem[] = [
     description: "Cottage cheese cubes in a creamy spinach sauce",
     price: 399,
     image:
-      "https://images.unsplash.com/photo-1596797038530-2c107aa8e1fa?w=500&q=80",
+      "https://imgs.search.brave.com/qUfHWtwJR7YkfFevV5v3-HK7Vmi55JTqYMRHrJAOCms/rs:fit:860:0:0:0/g:ce/aHR0cHM6Ly9pbWcu/ZnJlZXBpay5jb20v/cHJlbWl1bS1waG90/by9zcGluYWNoLXBh/bmVlci13b25kZXJf/MTE3OTEzMC02OTQy/MC5qcGc_c2VtdD1h/aXNfaHlicmlk",
     rating: 4.5,
     category: "Main Course",
     type: "veg",
-    isSpecial: false,
+    isSpecial: true,
   },
   {
     id: "v6",
@@ -87,7 +87,7 @@ export const menuItems: MenuItem[] = [
     description: "Potato and paneer dumplings in a rich, creamy tomato sauce",
     price: 449,
     image:
-      "https://images.unsplash.com/photo-1631452180519-c014fe946bc7?w=500&q=80",
+      "https://imgs.search.brave.com/Huq0whQaKk_oUhtlEVZxeYgYA8i-PR3M-bix0et4K2U/rs:fit:860:0:0:0/g:ce/aHR0cHM6Ly90NC5m/dGNkbi5uZXQvanBn/LzA4LzI0LzM1LzU5/LzM2MF9GXzgyNDM1/NTk4N19DR3Fkc3JR/NmpkVVphVjRRWnhD/ZTRmZW50U1hab2da/eC5qcGc",
     rating: 4.7,
     category: "Main Course",
     type: "veg",

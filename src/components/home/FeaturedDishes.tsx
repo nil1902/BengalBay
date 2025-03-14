@@ -32,7 +32,7 @@ const FeaturedDishes = ({
       name: "Butter Chicken",
       description:
         "Tender chicken in a rich, creamy tomato sauce with aromatic spices",
-      price: 16.99,
+      price: 160.99,
       image:
         "https://images.unsplash.com/photo-1603894584373-5ac82b2ae398?w=500&q=80",
       rating: 4.8,
@@ -44,7 +44,7 @@ const FeaturedDishes = ({
       name: "Vegetable Biryani",
       description:
         "Fragrant basmati rice cooked with mixed vegetables and aromatic spices",
-      price: 14.99,
+      price: 145.99,
       image:
         "https://images.unsplash.com/photo-1589302168068-964664d93dc0?w=500&q=80",
       rating: 4.6,
@@ -56,7 +56,7 @@ const FeaturedDishes = ({
       name: "Garlic Naan",
       description:
         "Soft, fluffy bread topped with garlic and butter, baked in a tandoor",
-      price: 3.99,
+      price: 9.99,
       image:
         "https://images.unsplash.com/photo-1600628421055-4d30de868b8f?w=500&q=80",
       rating: 4.7,
@@ -68,7 +68,7 @@ const FeaturedDishes = ({
       name: "Mango Lassi",
       description:
         "Refreshing yogurt drink blended with ripe mangoes and a hint of cardamom",
-      price: 4.99,
+      price: 39.99,
       image:
         "https://images.unsplash.com/photo-1527661591475-527312dd65f5?w=500&q=80",
       rating: 4.5,
@@ -80,7 +80,7 @@ const FeaturedDishes = ({
       name: "Paneer Tikka",
       description:
         "Chunks of cottage cheese marinated in spices and grilled to perfection",
-      price: 12.99,
+      price: 99.99,
       image:
         "https://images.unsplash.com/photo-1567188040759-fb8a883dc6d8?w=500&q=80",
       rating: 4.4,
@@ -92,7 +92,7 @@ const FeaturedDishes = ({
   onFavorite = (id) => console.log(`Added dish ${id} to favorites`),
 }: FeaturedDishesProps) => {
   const [currentIndex, setCurrentIndex] = useState(0);
-  const itemsPerView = 3;
+  const itemsPerView = 4;
   const maxIndex = Math.max(0, dishes.length - itemsPerView);
 
   const handlePrev = () => {

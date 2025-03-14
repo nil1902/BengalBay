@@ -58,11 +58,7 @@ const CartDrawer: React.FC<CartDrawerProps> = ({ children }) => {
         <SheetHeader className="space-y-2 pb-4">
           <div className="flex items-center justify-between">
             <SheetTitle className="text-xl font-bold">Your Cart</SheetTitle>
-            <SheetClose asChild>
-              <Button variant="ghost" size="icon">
-                <X className="h-4 w-4" />
-              </Button>
-            </SheetClose>
+            {/* Only one X button for closing */}
           </div>
           <div className="text-sm text-muted-foreground">
             {cartCount} {cartCount === 1 ? "item" : "items"} in your cart
@@ -155,7 +151,7 @@ const CartDrawer: React.FC<CartDrawerProps> = ({ children }) => {
                 </div>
                 <div className="flex justify-between">
                   <span>Delivery</span>
-                  <span>{formatPrice(cartTotal > 500 ? 0 : 50)}</span>
+                  <span>{cartTotal > 0 ? "Free" : formatPrice(0)}</span>
                 </div>
                 <div className="flex justify-between">
                   <span>Tax (5%)</span>
@@ -164,11 +160,7 @@ const CartDrawer: React.FC<CartDrawerProps> = ({ children }) => {
                 <Separator />
                 <div className="flex justify-between font-medium">
                   <span>Total</span>
-                  <span>
-                    {formatPrice(
-                      cartTotal + (cartTotal > 500 ? 0 : 50) + cartTotal * 0.05,
-                    )}
-                  </span>
+                  <span>{formatPrice(cartTotal + cartTotal * 0.05)}</span>
                 </div>
               </div>
 
