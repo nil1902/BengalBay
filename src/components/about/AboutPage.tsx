@@ -329,6 +329,182 @@ const AboutPage = () => {
           </div>
         </div>
       </div>
+
+      {/* Culinary Philosophy */}
+      <div className="max-w-7xl mx-auto py-16 px-4 sm:px-6 lg:px-8">
+        <div className="grid md:grid-cols-2 gap-12 items-center">
+          <div>
+            <h2 className="text-3xl font-bold text-gray-900 mb-6">
+              Our Culinary Philosophy
+            </h2>
+            <div className="space-y-4 text-gray-600">
+              <p>
+                At Nil's Kitchen, we believe that food is more than just
+                sustenance—it's an experience that brings people together and
+                creates lasting memories.
+              </p>
+              <p>
+                Our culinary philosophy is rooted in three core principles:
+                authenticity, quality, and innovation. We stay true to
+                traditional recipes while incorporating modern techniques and
+                presentations.
+              </p>
+              <p>
+                We source the freshest ingredients from local farmers and
+                suppliers whenever possible, ensuring that every dish we serve
+                is of the highest quality. Our spices are ground in-house daily
+                to maintain their aromatic potency.
+              </p>
+              <p>
+                Each dish at Nil's Kitchen tells a story—of heritage, of
+                passion, and of the diverse culinary traditions that inspire us.
+                We invite you to be part of this story and experience the magic
+                that happens when exceptional food is served with genuine
+                hospitality.
+              </p>
+            </div>
+          </div>
+          <div className="grid grid-cols-2 gap-4">
+            <div className="rounded-lg overflow-hidden shadow-md">
+              <img
+                src="https://images.unsplash.com/photo-1565557623262-b51c2513a641?w=600&q=80"
+                alt="Spice Selection"
+                className="w-full h-full object-cover"
+              />
+            </div>
+            <div className="rounded-lg overflow-hidden shadow-md mt-8">
+              <img
+                src="https://images.unsplash.com/photo-1547592180-85f173990554?w=600&q=80"
+                alt="Chef Preparing Food"
+                className="w-full h-full object-cover"
+              />
+            </div>
+            <div className="rounded-lg overflow-hidden shadow-md">
+              <img
+                src="https://images.unsplash.com/photo-1512621776951-a57141f2eefd?w=600&q=80"
+                alt="Fresh Ingredients"
+                className="w-full h-full object-cover"
+              />
+            </div>
+            <div className="rounded-lg overflow-hidden shadow-md mt-8">
+              <img
+                src="https://images.unsplash.com/photo-1607330289024-1535c6b4e1c1?w=600&q=80"
+                alt="Plated Dish"
+                className="w-full h-full object-cover"
+              />
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Community Involvement */}
+      <div className="bg-gray-50 py-16">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-12">
+            <h2 className="text-3xl font-bold text-gray-900 mb-4">
+              Community Involvement
+            </h2>
+            <p className="text-lg text-gray-600 max-w-2xl mx-auto">
+              We believe in giving back to the community that has supported us
+              throughout our journey
+            </p>
+          </div>
+
+          <div className="grid md:grid-cols-3 gap-8">
+            <Card className="bg-white">
+              <CardContent className="pt-6">
+                <div className="flex flex-col items-center text-center">
+                  <div className="bg-green-100 p-3 rounded-full mb-4">
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      width="24"
+                      height="24"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      className="h-6 w-6 text-green-600"
+                    >
+                      <path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1 0-5H20"></path>
+                    </svg>
+                  </div>
+                  <h3 className="text-xl font-semibold mb-2">
+                    Culinary Education
+                  </h3>
+                  <p className="text-gray-600">
+                    We partner with local schools to provide culinary education
+                    programs, teaching students about nutrition, cooking
+                    techniques, and food sustainability.
+                  </p>
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card className="bg-white">
+              <CardContent className="pt-6">
+                <div className="flex flex-col items-center text-center">
+                  <div className="bg-blue-100 p-3 rounded-full mb-4">
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      width="24"
+                      height="24"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      className="h-6 w-6 text-blue-600"
+                    >
+                      <path d="M22 12h-4l-3 9L9 3l-3 9H2"></path>
+                    </svg>
+                  </div>
+                  <h3 className="text-xl font-semibold mb-2">
+                    Food Donation Program
+                  </h3>
+                  <p className="text-gray-600">
+                    Through our food donation program, we provide meals to local
+                    shelters and food banks, ensuring that everyone in our
+                    community has access to nutritious food.
+                  </p>
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card className="bg-white">
+              <CardContent className="pt-6">
+                <div className="flex flex-col items-center text-center">
+                  <div className="bg-purple-100 p-3 rounded-full mb-4">
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      width="24"
+                      height="24"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      className="h-6 w-6 text-purple-600"
+                    >
+                      <path d="M3 18v-6a9 9 0 0 1 18 0v6"></path>
+                      <path d="M21 19a2 2 0 0 1-2 2h-1a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h3zM3 19a2 2 0 0 0 2 2h1a2 2 0 0 0 2-2v-3a2 2 0 0 0-2-2H3z"></path>
+                    </svg>
+                  </div>
+                  <h3 className="text-xl font-semibold mb-2">Charity Events</h3>
+                  <p className="text-gray-600">
+                    We regularly host charity dinners and fundraising events,
+                    with proceeds going to various local causes and
+                    organizations that make a difference in our community.
+                  </p>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+        </div>
+      </div>
     </div>
   );
 };

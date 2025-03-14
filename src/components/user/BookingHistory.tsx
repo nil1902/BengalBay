@@ -19,6 +19,11 @@ interface Booking {
   userEmail?: string;
   name?: string;
   phone?: string;
+  formattedDate?: string;
+  restaurantName?: string;
+  restaurantAddress?: string;
+  restaurantPhone?: string;
+  timestamp?: string;
 }
 
 const BookingHistory = () => {
@@ -49,9 +54,24 @@ const BookingHistory = () => {
         const userBookings: Booking[] = [];
 
         querySnapshot.forEach((doc) => {
-          userBookings.push({ id: doc.id, ...doc.data() } as Booking);
+          const bookingData = doc.data();
+          // Ensure we have the correct data structure
+          userBookings.push({
+            id: doc.id,
+            date: bookingData.date || new Date().toISOString(),
+            time: bookingData.time || "12:00 PM",
+            guests: bookingData.guests || 2,
+            specialRequests: bookingData.specialRequests || "",
+            status: bookingData.status || "Upcoming",
+            userId: bookingData.userId || currentUser.uid,
+            userEmail: bookingData.userEmail || currentUser.email,
+            name: bookingData.name || currentUser.displayName || "Guest",
+            phone: bookingData.phone || "",
+            ...bookingData,
+          } as Booking);
         });
 
+        console.log("Fetched bookings:", userBookings);
         setBookings(userBookings);
       } catch (error) {
         console.error("Error fetching bookings:", error);
@@ -63,6 +83,7 @@ const BookingHistory = () => {
           try {
             const parsedBookings = JSON.parse(storedBookings);
             setBookings(parsedBookings);
+            console.log("Using localStorage bookings:", parsedBookings);
           } catch (err) {
             console.error("Failed to parse bookings from localStorage", err);
           }
@@ -161,8 +182,9 @@ const BookingHistory = () => {
                       Reservation #{booking.id}
                     </CardTitle>
                     <p className="text-sm text-gray-500">
-                      {new Date(booking.date).toLocaleDateString()} at{" "}
-                      {booking.time}
+                      {booking.formattedDate ||
+                        new Date(booking.date).toLocaleDateString()}{" "}
+                      at {booking.time}
                     </p>
                   </div>
                   <Badge

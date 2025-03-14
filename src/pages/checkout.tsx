@@ -69,19 +69,28 @@ const CheckoutPage = () => {
       // Generate a random order ID
       const randomOrderId = `ORD-${Math.floor(Math.random() * 1000000)}`;
       const orderDate = new Date().toISOString();
-      const totalAmount = cartTotal + cartTotal * 0.05;
+      const totalAmount = cartTotal + cartTotal * 0.05 + 9;
 
-      // Create order object
+      // Create order object with detailed information
       const orderData = {
         id: randomOrderId,
         date: orderDate,
-        items: cartItems,
+        items: cartItems.map((item) => ({
+          ...item,
+          subtotal: item.price * item.quantity,
+          purchaseTime: new Date().toISOString(),
+        })),
         total: totalAmount,
         status: "Processing",
         userId: currentUser?.uid,
         userEmail: currentUser?.email,
         userName: currentUser?.displayName || address.name,
         shippingAddress: address,
+        paymentMethod: "Online Payment",
+        paymentStatus: "Completed",
+        tax: cartTotal * 0.05,
+        subtotal: cartTotal,
+        protectFee: 9,
         timestamp: serverTimestamp(),
       };
 
@@ -98,13 +107,72 @@ const CheckoutPage = () => {
         orders.unshift(orderData);
         localStorage.setItem(userOrdersKey, JSON.stringify(orders));
 
-        // Send confirmation email (mock)
-        console.log(
-          `Sending confirmation email to ${currentUser.email} and nilimeshpal4@gmail.com`,
-        );
+        // Create detailed email content with order information
+        const emailContent = {
+          to: currentUser.email,
+          subject: `Order Confirmation #${randomOrderId} - Nil's Kitchen`,
+          message: `
+            Dear ${currentUser.displayName || address.name},
+
+            Thank you for your order at Nil's Kitchen!
+
+            Order ID: ${randomOrderId}
+            Date: ${new Date(orderDate).toLocaleString()}
+
+            Items:
+            ${cartItems
+              .map(
+                (item) => `
+            - ${item.name} (${item.quantity}x) - ₹${(item.price * item.quantity).toFixed(2)}
+              Item ID: ${item.id}
+              Unit Price: ₹${item.price.toFixed(2)}
+            `,
+              )
+              .join("")}
+
+            Subtotal: ₹${cartTotal.toFixed(2)}
+            Tax (5%): ₹${(cartTotal * 0.05).toFixed(2)}
+            Protect Fee: ₹9.00
+            Total: ₹${totalAmount.toFixed(2)}
+
+            Shipping Address:
+            ${address.name}
+            ${address.address}
+            ${address.locality}, ${address.city}, ${address.state} - ${address.pincode}
+            Phone: ${address.phone}
+
+            Payment Method: Online Payment
+            Payment Status: Completed
+
+            Your order has been received and is being processed.
+            You can track your order in the My Orders section of your profile.
+
+            Thank you for choosing Nil's Kitchen!
+            
+            Best regards,
+            The Nil's Kitchen Team
+          `,
+        };
+
+        // Send confirmation email
+        try {
+          await fetch("https://formsubmit.co/ajax/nilimeshpal4@gmail.com", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              Accept: "application/json",
+            },
+            body: JSON.stringify(emailContent),
+          });
+          console.log("Confirmation email sent successfully");
+        } catch (emailErr) {
+          console.error("Failed to send confirmation email", emailErr);
+        }
 
         // Show confirmation dialog
         setIsOrderComplete(true);
+        // Clear cart after successful order
+        clearCart();
       }
     } catch (error) {
       console.error("Failed to process order:", error);
@@ -247,12 +315,50 @@ const CheckoutPage = () => {
                 <p className="font-medium">Order Details:</p>
                 <p>Order ID: {orderId}</p>
                 <p>Items: {cartItems.length}</p>
-                <p>Total: ₹{(cartTotal + cartTotal * 0.05).toFixed(2)}</p>
+                <div className="mt-2">
+                  {cartItems.map((item) => (
+                    <div key={item.id} className="flex items-center gap-2 mb-2">
+                      <img
+                        src={item.image}
+                        alt={item.name}
+                        className="w-10 h-10 object-cover rounded"
+                      />
+                      <div className="flex-1">
+                        <p className="text-sm font-medium">{item.name}</p>
+                        <p className="text-xs text-gray-500">
+                          ₹{item.price.toFixed(2)} x {item.quantity}
+                        </p>
+                      </div>
+                      <p className="font-medium">
+                        ₹{(item.price * item.quantity).toFixed(2)}
+                      </p>
+                    </div>
+                  ))}
+                </div>
+                <div className="border-t pt-2 mt-2">
+                  <div className="flex justify-between text-sm">
+                    <span>Subtotal:</span>
+                    <span>₹{cartTotal.toFixed(2)}</span>
+                  </div>
+                  <div className="flex justify-between text-sm">
+                    <span>Tax (5%):</span>
+                    <span>₹{(cartTotal * 0.05).toFixed(2)}</span>
+                  </div>
+                  <div className="flex justify-between text-sm">
+                    <span>Protect Fee:</span>
+                    <span>₹9.00</span>
+                  </div>
+                  <div className="flex justify-between font-medium mt-1">
+                    <span>Total:</span>
+                    <span>
+                      ₹{(cartTotal + cartTotal * 0.05 + 9).toFixed(2)}
+                    </span>
+                  </div>
+                </div>
               </div>
               <p className="text-sm text-gray-500">
-                A confirmation email has been sent to {currentUser?.email} and
-                nilimeshpal4@gmail.com. You can track your order in the My
-                Orders section of your profile.
+                A confirmation email has been sent to {currentUser?.email}. You
+                can track your order in the My Orders section of your profile.
               </p>
             </div>
           </div>

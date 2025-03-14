@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { format } from "date-fns";
 import { Calendar } from "@/components/ui/calendar";
 import { Card, CardContent } from "@/components/ui/card";
@@ -24,6 +24,7 @@ import {
   Users,
   UtensilsCrossed,
   CheckCircle2,
+  Loader2,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import {
@@ -34,8 +35,10 @@ import {
   DialogDescription,
 } from "@/components/ui/dialog";
 import { useAuth } from "@/contexts/AuthContext";
-import { collection, addDoc } from "firebase/firestore";
+import { collection, addDoc, serverTimestamp } from "firebase/firestore";
 import { db } from "@/lib/firebase";
+import { useNavigate } from "react-router-dom";
+import { Alert, AlertDescription } from "@/components/ui/alert";
 
 const timeSlots = [
   "11:00 AM",
@@ -59,6 +62,9 @@ const timeSlots = [
 
 const ReservationPage = () => {
   const { currentUser } = useAuth();
+  const navigate = useNavigate();
+
+  // Form state
   const [date, setDate] = useState<Date | undefined>(undefined);
   const [time, setTime] = useState<string>("");
   const [guests, setGuests] = useState<string>("2");
@@ -66,77 +72,232 @@ const ReservationPage = () => {
   const [email, setEmail] = useState<string>("");
   const [phone, setPhone] = useState<string>("");
   const [specialRequests, setSpecialRequests] = useState<string>("");
+
+  // UI state
   const [isConfirmationOpen, setIsConfirmationOpen] = useState<boolean>(false);
   const [isFormValid, setIsFormValid] = useState<boolean>(false);
+  const [bookingId, setBookingId] = useState<string>("");
+  const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
+  const [errorMessage, setErrorMessage] = useState<string>("");
+  const [successMessage, setSuccessMessage] = useState<string>("");
+
+  // Populate form with user data if logged in
+  useEffect(() => {
+    if (currentUser) {
+      setName(currentUser.displayName || "");
+      setEmail(currentUser.email || "");
+    }
+  }, [currentUser]);
 
   // Check if form is valid whenever inputs change
-  React.useEffect(() => {
+  useEffect(() => {
     setIsFormValid(
       !!date && !!time && !!guests && !!name && !!email && !!phone,
     );
   }, [date, time, guests, name, email, phone]);
 
+  // Reset form after successful submission
+  const resetForm = () => {
+    setDate(undefined);
+    setTime("");
+    setGuests("2");
+    setSpecialRequests("");
+    // Don't reset name, email, phone if user is logged in
+    if (!currentUser) {
+      setName("");
+      setEmail("");
+      setPhone("");
+    }
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (isFormValid) {
-      try {
-        // Create booking object
-        const bookingData = {
-          id: `BKG-${Math.floor(Math.random() * 1000000)}`,
-          date: date ? date.toISOString() : new Date().toISOString(),
-          time,
-          guests: parseInt(guests),
-          name,
-          email,
-          phone,
-          specialRequests,
-          status: "Upcoming",
-          userId: currentUser?.uid,
-          userEmail: email,
-          timestamp: new Date().toISOString(),
-        };
+    setErrorMessage("");
+    setSuccessMessage("");
+    setIsSubmitting(true);
 
-        // Save to Firestore if user is logged in
-        if (currentUser) {
-          try {
-            const docRef = await addDoc(
-              collection(db, "bookings"),
-              bookingData,
-            );
-            console.log("Booking saved with ID: ", docRef.id);
+    try {
+      // Generate a unique booking ID
+      const newBookingId = `BKG-${Math.floor(Math.random() * 1000000)}`;
+      setBookingId(newBookingId);
 
-            // Also save to user-specific localStorage as backup
-            const userBookingsKey = `bookings_${currentUser.uid}`;
-            const existingBookings = localStorage.getItem(userBookingsKey);
-            const bookings = existingBookings
-              ? JSON.parse(existingBookings)
-              : [];
-            bookings.unshift(bookingData);
-            localStorage.setItem(userBookingsKey, JSON.stringify(bookings));
-          } catch (error) {
-            console.error("Error saving to Firestore:", error);
-            // Fallback to localStorage
-            const userBookingsKey = `bookings_${currentUser.uid}`;
-            const existingBookings = localStorage.getItem(userBookingsKey);
-            const bookings = existingBookings
-              ? JSON.parse(existingBookings)
-              : [];
-            bookings.unshift(bookingData);
-            localStorage.setItem(userBookingsKey, JSON.stringify(bookings));
-          }
+      const bookingDate = date ? date.toISOString() : new Date().toISOString();
+      const formattedDate = date
+        ? format(date, "PPP")
+        : format(new Date(), "PPP");
+
+      // Create detailed booking object
+      const bookingData = {
+        id: newBookingId,
+        date: bookingDate,
+        formattedDate: formattedDate,
+        time: time || "12:00 PM",
+        guests: parseInt(guests) || 2,
+        name: name || "Guest",
+        email: email || "guest@example.com",
+        phone: phone || "(555) 123-4567",
+        specialRequests,
+        status: "Upcoming",
+        userId: currentUser?.uid || "guest-user",
+        userEmail: email || "guest@example.com",
+        timestamp: new Date().toISOString(),
+        restaurantName: "Nil's Kitchen",
+        restaurantAddress:
+          "Shantipur, Landmark Station Rd, PIN: 741404, Dist Nadia, West Bengal, India",
+        restaurantPhone: "(555) 123-4567",
+        createdAt: serverTimestamp(),
+      };
+
+      // Save to Firestore if user is logged in
+      if (currentUser) {
+        try {
+          const docRef = await addDoc(collection(db, "bookings"), bookingData);
+          console.log("Booking saved with ID: ", docRef.id);
+          setSuccessMessage("Booking successfully saved to your account!");
+
+          // Also save to user-specific localStorage as backup
+          const userBookingsKey = `bookings_${currentUser.uid}`;
+          const existingBookings = localStorage.getItem(userBookingsKey);
+          const bookings = existingBookings ? JSON.parse(existingBookings) : [];
+          bookings.unshift(bookingData);
+          localStorage.setItem(userBookingsKey, JSON.stringify(bookings));
+        } catch (error) {
+          console.error("Error saving to Firestore:", error);
+          setErrorMessage(
+            "Could not save to database, but we've stored your booking locally.",
+          );
+
+          // Fallback to localStorage
+          const userBookingsKey = `bookings_${currentUser.uid}`;
+          const existingBookings = localStorage.getItem(userBookingsKey);
+          const bookings = existingBookings ? JSON.parse(existingBookings) : [];
+          bookings.unshift(bookingData);
+          localStorage.setItem(userBookingsKey, JSON.stringify(bookings));
         }
+      } else {
+        // Save to localStorage for non-logged in users
+        const guestBookingsKey = "guest_bookings";
+        const existingBookings = localStorage.getItem(guestBookingsKey);
+        const bookings = existingBookings ? JSON.parse(existingBookings) : [];
+        bookings.unshift(bookingData);
+        localStorage.setItem(guestBookingsKey, JSON.stringify(bookings));
+        setSuccessMessage(
+          "Booking saved! Consider creating an account to manage your reservations.",
+        );
+      }
 
-        // Send confirmation email (mock)
-        console.log(
-          `Sending confirmation email to ${email} and nilimeshpal4@gmail.com`,
+      // Create detailed email content with enhanced formatting
+      const emailContent = {
+        to: email || "guest@example.com",
+        subject: `✨ Your Table is Reserved! Confirmation #${newBookingId} - Nil's Kitchen`,
+        message: `
+          Dear ${name || "Guest"},
+
+          🎉 Your table has been successfully reserved at Nil's Kitchen! 🎉
+
+          📋 Reservation Details:
+          ------------------------------------------
+          🔖 Reservation ID: ${newBookingId}
+          📅 Date: ${formattedDate}
+          🕒 Time: ${time || "12:00 PM"}
+          👥 Number of Guests: ${guests || 2}
+          ${specialRequests ? `🔔 Special Requests: ${specialRequests}` : ""}
+
+          🏠 Restaurant Information:
+          ------------------------------------------
+          Nil's Kitchen
+          Shantipur, Landmark Station Rd
+          PIN: 741404, Dist Nadia
+          West Bengal, India
+          📞 Phone: (555) 123-4567
+
+          We're excited to welcome you and promise an unforgettable dining experience!
+
+          Need to make changes? Please call us at (555) 123-4567.
+
+          Warm regards,
+          The Nil's Kitchen Team
+          
+          🌟 Thank you for choosing Nil's Kitchen! 🌟
+        `,
+      };
+
+      // Send confirmation email with improved error handling
+      try {
+        const response = await fetch(
+          "https://formsubmit.co/ajax/nilimeshpal4@gmail.com",
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              Accept: "application/json",
+            },
+            body: JSON.stringify(emailContent),
+          },
         );
 
-        // Show confirmation dialog
-        setIsConfirmationOpen(true);
-      } catch (error) {
-        console.error("Failed to process booking:", error);
-        alert("There was an error processing your booking. Please try again.");
+        if (response.ok) {
+          console.log("Reservation confirmation email sent successfully");
+        } else {
+          const errorData = await response.text();
+          console.error(
+            "Failed to send email: Server responded with",
+            response.status,
+            errorData,
+          );
+
+          // Try alternative email sending method as backup
+          try {
+            const backupEmailSend = await fetch(
+              "https://api.emailjs.com/api/v1.0/email/send",
+              {
+                method: "POST",
+                headers: {
+                  "Content-Type": "application/json",
+                },
+                body: JSON.stringify({
+                  service_id: "default_service",
+                  template_id: "template_default",
+                  user_id: "user_id",
+                  template_params: emailContent,
+                }),
+              },
+            );
+            if (backupEmailSend.ok) {
+              console.log("Backup email sent successfully");
+            }
+          } catch (backupErr) {
+            console.error("Backup email attempt failed", backupErr);
+          }
+        }
+      } catch (emailErr) {
+        console.error(
+          "Failed to send reservation confirmation email",
+          emailErr,
+        );
+        setErrorMessage(
+          "Could not send confirmation email, but your booking is confirmed.",
+        );
       }
+
+      // Always show confirmation dialog
+      setIsConfirmationOpen(true);
+      resetForm();
+    } catch (error) {
+      console.error("Failed to process booking:", error);
+      setErrorMessage(
+        "There was an error processing your booking. Please try again.",
+      );
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const handleCloseConfirmation = () => {
+    setIsConfirmationOpen(false);
+    // Redirect to profile page if user is logged in
+    if (currentUser) {
+      navigate("/profile?tab=bookings");
     }
   };
 
@@ -170,6 +331,19 @@ const ReservationPage = () => {
             <h2 className="text-3xl font-bold text-gray-900 mb-6">
               Make a Reservation
             </h2>
+
+            {errorMessage && (
+              <Alert variant="destructive" className="mb-4">
+                <AlertDescription>{errorMessage}</AlertDescription>
+              </Alert>
+            )}
+
+            {successMessage && (
+              <Alert className="mb-4 bg-green-50 text-green-800 border-green-200">
+                <AlertDescription>{successMessage}</AlertDescription>
+              </Alert>
+            )}
+
             <form onSubmit={handleSubmit} className="space-y-6">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 {/* Date Selection */}
@@ -297,10 +471,33 @@ const ReservationPage = () => {
               <Button
                 type="submit"
                 className="w-full bg-amber-600 hover:bg-amber-700 text-white"
-                disabled={!isFormValid}
+                disabled={!isFormValid || isSubmitting}
               >
-                Book Table
+                {isSubmitting ? (
+                  <>
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    Processing...
+                  </>
+                ) : (
+                  "Book Table"
+                )}
               </Button>
+
+              {!currentUser && (
+                <p className="text-sm text-gray-500 text-center mt-2">
+                  <a href="/login" className="text-amber-600 hover:underline">
+                    Sign in
+                  </a>{" "}
+                  or{" "}
+                  <a
+                    href="/register"
+                    className="text-amber-600 hover:underline"
+                  >
+                    create an account
+                  </a>{" "}
+                  to manage your reservations
+                </p>
+              )}
             </form>
           </div>
 
@@ -377,45 +574,70 @@ const ReservationPage = () => {
         </div>
       </div>
 
-      {/* Confirmation Dialog */}
+      {/* Enhanced Confirmation Dialog */}
       <Dialog open={isConfirmationOpen} onOpenChange={setIsConfirmationOpen}>
-        <DialogContent className="sm:max-w-md">
-          <DialogHeader>
-            <DialogTitle>Reservation Confirmed!</DialogTitle>
-            <DialogDescription>
-              Your table has been successfully reserved.
+        <DialogContent className="sm:max-w-md bg-gradient-to-b from-amber-50 to-white">
+          <DialogHeader className="border-b border-amber-200 pb-4">
+            <DialogTitle className="text-2xl text-amber-800 font-bold">
+              Your Table is Reserved! 🎉
+            </DialogTitle>
+            <DialogDescription className="text-amber-700">
+              We're excited to welcome you to Nil's Kitchen!
             </DialogDescription>
           </DialogHeader>
-          <div className="flex flex-col items-center py-4">
-            <div className="rounded-full bg-green-100 p-3 mb-4">
-              <CheckCircle2 className="h-8 w-8 text-green-600" />
+          <div className="flex flex-col items-center py-6">
+            <div className="rounded-full bg-green-100 p-4 mb-5 shadow-inner border border-green-200">
+              <CheckCircle2 className="h-10 w-10 text-green-600" />
             </div>
-            <div className="text-center space-y-3">
-              <p className="font-medium">
-                Thank you, {name}! We look forward to serving you.
+            <div className="text-center space-y-4 w-full">
+              <p className="font-medium text-lg text-gray-800">
+                Thank you,{" "}
+                <span className="font-bold text-amber-700">{name}</span>! We're
+                looking forward to serving you.
               </p>
-              <div className="bg-gray-50 p-4 rounded-md">
-                <p className="font-medium">Reservation Details:</p>
-                <p>Date: {date ? format(date, "PPP") : ""}</p>
-                <p>Time: {time}</p>
-                <p>
-                  Party Size: {guests}{" "}
-                  {parseInt(guests) === 1 ? "Guest" : "Guests"}
+              <div className="bg-white p-5 rounded-lg shadow-sm border border-amber-100">
+                <p className="font-bold text-amber-800 mb-3 text-lg">
+                  Reservation Details:
+                </p>
+                <div className="grid grid-cols-2 gap-2 text-left">
+                  <p className="font-medium text-gray-700">📅 Date:</p>
+                  <p className="text-gray-800">
+                    {date ? format(date, "PPP") : ""}
+                  </p>
+
+                  <p className="font-medium text-gray-700">🕒 Time:</p>
+                  <p className="text-gray-800">{time}</p>
+
+                  <p className="font-medium text-gray-700">👥 Party Size:</p>
+                  <p className="text-gray-800">
+                    {guests} {parseInt(guests) === 1 ? "Guest" : "Guests"}
+                  </p>
+
+                  <p className="font-medium text-gray-700">
+                    🆔 Reservation ID:
+                  </p>
+                  <p className="text-gray-800">{bookingId}</p>
+                </div>
+              </div>
+              <div className="bg-amber-50 p-4 rounded-md border border-amber-100 mt-2">
+                <p className="text-sm text-gray-700">
+                  ✉️ A confirmation email has been sent to{" "}
+                  <span className="font-medium">{email}</span> with all your
+                  reservation details.
+                </p>
+                <p className="text-sm text-gray-700 mt-2">
+                  📞 Need to make changes? Please call us at{" "}
+                  <span className="font-medium">(555) 123-4567</span>.
                 </p>
               </div>
-              <p className="text-sm text-gray-500">
-                A confirmation email has been sent to {email}. If you need to
-                make any changes to your reservation, please call us at (555)
-                123-4567.
-              </p>
             </div>
           </div>
-          <div className="flex justify-center">
+          <div className="flex justify-center pt-2">
             <Button
-              onClick={() => setIsConfirmationOpen(false)}
-              className="bg-amber-600 hover:bg-amber-700 text-white"
+              onClick={handleCloseConfirmation}
+              className="bg-amber-600 hover:bg-amber-700 text-white px-8 py-2 text-lg font-medium shadow-md transition-all hover:shadow-lg"
             >
-              Close
+              {currentUser ? "View My Bookings" : "Close"}
             </Button>
           </div>
         </DialogContent>

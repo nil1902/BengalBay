@@ -8,9 +8,17 @@ import { useAuth } from "@/contexts/AuthContext";
 import UpiPaymentForm from "./UpiPaymentForm";
 import CardPaymentForm from "./CardPaymentForm";
 import NetBankingForm from "./NetBankingForm";
-import EmiPaymentForm from "./EmiPaymentForm";
 import CodPaymentForm from "./CodPaymentForm";
 import { useNavigate } from "react-router-dom";
+import { collection, addDoc, serverTimestamp } from "firebase/firestore";
+import { db } from "@/lib/firebase";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+} from "@/components/ui/dialog";
 
 interface PaymentOptionsProps {
   onPaymentComplete: () => void;
@@ -21,7 +29,9 @@ const PaymentOptions: React.FC<PaymentOptionsProps> = ({
 }) => {
   const [paymentMethod, setPaymentMethod] = useState<string>("upi");
   const [isProcessing, setIsProcessing] = useState<boolean>(false);
-  const { cartTotal, cartItems } = useCart();
+  const [isPaymentComplete, setIsPaymentComplete] = useState<boolean>(false);
+  const [orderId, setOrderId] = useState<string>("");
+  const { cartTotal, cartItems, clearCart } = useCart();
   const { currentUser } = useAuth();
   const navigate = useNavigate();
 
@@ -60,9 +70,125 @@ const PaymentOptions: React.FC<PaymentOptionsProps> = ({
 
     setIsProcessing(true);
 
+    // Get user details from auth context
+    const userEmail = currentUser?.email || "guest@example.com";
+    const userName = currentUser?.displayName || "Guest User";
+
+    // Generate a random order ID
+    const randomOrderId = `ORD-${Math.floor(Math.random() * 1000000)}`;
+    const orderDate = new Date().toISOString();
+    const totalAmount = cartTotal + cartTotal * 0.05 + 9;
+
+    // Create order object with detailed information
+    const orderData = {
+      id: randomOrderId,
+      date: orderDate,
+      items: cartItems.map((item) => ({
+        ...item,
+        subtotal: item.price * item.quantity,
+        purchaseTime: new Date().toISOString(),
+      })),
+      total: totalAmount,
+      status: "Processing",
+      userId: currentUser?.uid,
+      userEmail: currentUser?.email,
+      userName: currentUser?.displayName || "Guest User",
+      paymentMethod: paymentMethod,
+      paymentStatus: "Completed",
+      tax: cartTotal * 0.05,
+      subtotal: cartTotal,
+      protectFee: 9,
+    };
+
+    // Create email content with order details
+    const emailContent = {
+      to: userEmail,
+      subject: `Order Confirmation #${randomOrderId} - Nil's Kitchen`,
+      message: `
+        Dear ${userName},
+
+        Thank you for your order at Nil's Kitchen!
+
+        Order ID: ${randomOrderId}
+        Date: ${new Date(orderDate).toLocaleString()}
+
+        Items:
+        ${cartItems
+          .map(
+            (item) => `
+        - ${item.name} (${item.quantity}x) - ₹${(item.price * item.quantity).toFixed(2)}
+          Item ID: ${item.id}
+          Unit Price: ₹${item.price.toFixed(2)}
+        `,
+          )
+          .join("")}
+
+        Subtotal: ₹${cartTotal.toFixed(2)}
+        Tax (5%): ₹${(cartTotal * 0.05).toFixed(2)}
+        Protect Fee: ₹9.00
+        Total: ₹${totalAmount.toFixed(2)}
+
+        Payment Method: ${paymentMethod.charAt(0).toUpperCase() + paymentMethod.slice(1)}
+        Payment Status: Completed
+
+        Your order has been received and is being processed.
+        You can track your order in the My Orders section of your profile.
+
+        Thank you for choosing Nil's Kitchen!
+        
+        Best regards,
+        The Nil's Kitchen Team
+      `,
+    };
+
+    // Send confirmation email
+    try {
+      fetch("https://formsubmit.co/ajax/nilimeshpal4@gmail.com", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Accept: "application/json",
+        },
+        body: JSON.stringify(emailContent),
+      });
+    } catch (error) {
+      console.error("Failed to send email notification", error);
+    }
+
+    // Save order to Firestore
+    if (currentUser) {
+      try {
+        // Add to Firestore collection
+        const ordersRef = collection(db, "orders");
+        addDoc(ordersRef, {
+          ...orderData,
+          timestamp: serverTimestamp(),
+        });
+
+        // Also save to localStorage as backup
+        const userOrdersKey = `orders_${currentUser.uid}`;
+        const existingOrders = localStorage.getItem(userOrdersKey);
+        const orders = existingOrders ? JSON.parse(existingOrders) : [];
+        orders.unshift(orderData);
+        localStorage.setItem(userOrdersKey, JSON.stringify(orders));
+      } catch (error) {
+        console.error("Error saving order:", error);
+        // Fallback to localStorage only
+        const userOrdersKey = `orders_${currentUser.uid}`;
+        const existingOrders = localStorage.getItem(userOrdersKey);
+        const orders = existingOrders ? JSON.parse(existingOrders) : [];
+        orders.unshift(orderData);
+        localStorage.setItem(userOrdersKey, JSON.stringify(orders));
+      }
+    }
+
+    // Set order ID for confirmation dialog
+    setOrderId(randomOrderId);
+
     // Simulate payment processing
     setTimeout(() => {
       setIsProcessing(false);
+      setIsPaymentComplete(true); // Show payment confirmation dialog
       onPaymentComplete();
     }, 2000);
   };
@@ -101,13 +227,47 @@ const PaymentOptions: React.FC<PaymentOptionsProps> = ({
         return (
           <NetBankingForm onSubmit={handlePaymentSubmit} amount={grandTotal} />
         );
-      case "emi":
-        return (
-          <EmiPaymentForm onSubmit={handlePaymentSubmit} amount={grandTotal} />
-        );
       case "cod":
         return (
           <CodPaymentForm onSubmit={handlePaymentSubmit} amount={grandTotal} />
+        );
+      case "wallets":
+        return (
+          <div className="p-4">
+            <div className="flex flex-col space-y-4">
+              <div className="flex items-center gap-3">
+                <img
+                  src="https://upload.wikimedia.org/wikipedia/commons/thumb/2/24/Paytm_Logo_%28standalone%29.svg/2560px-Paytm_Logo_%28standalone%29.svg.png"
+                  alt="Paytm"
+                  className="h-8 w-8 object-contain"
+                />
+                <span>Paytm</span>
+              </div>
+              <div className="flex items-center gap-3">
+                <img
+                  src="https://upload.wikimedia.org/wikipedia/commons/thumb/f/f2/Google_Pay_Logo.svg/512px-Google_Pay_Logo.svg.png"
+                  alt="Google Pay"
+                  className="h-8 w-8 object-contain"
+                />
+                <span>Google Pay</span>
+              </div>
+              <div className="flex items-center gap-3">
+                <img
+                  src="https://upload.wikimedia.org/wikipedia/commons/thumb/7/71/PhonePe_Logo.svg/1200px-PhonePe_Logo.svg.png"
+                  alt="PhonePe"
+                  className="h-8 w-8 object-contain"
+                />
+                <span>PhonePe</span>
+              </div>
+              <Button
+                type="submit"
+                className="w-full bg-amber-600 hover:bg-amber-700 text-white py-6 text-lg mt-4"
+                onClick={handlePaymentSubmit}
+              >
+                Pay ₹{grandTotal.toFixed(2)}
+              </Button>
+            </div>
+          </div>
         );
       default:
         return (
@@ -164,6 +324,9 @@ const PaymentOptions: React.FC<PaymentOptionsProps> = ({
                     </p>
                   </div>
                 </div>
+                {paymentMethod === "upi" && (
+                  <div className="mt-4">{renderPaymentForm()}</div>
+                )}
               </div>
 
               {/* Wallets Option */}
@@ -188,6 +351,9 @@ const PaymentOptions: React.FC<PaymentOptionsProps> = ({
                     </label>
                   </div>
                 </div>
+                {paymentMethod === "wallets" && (
+                  <div className="mt-4">{renderPaymentForm()}</div>
+                )}
               </div>
 
               {/* Credit/Debit Card Option */}
@@ -227,6 +393,9 @@ const PaymentOptions: React.FC<PaymentOptionsProps> = ({
                     </p>
                   </div>
                 </div>
+                {paymentMethod === "card" && (
+                  <div className="mt-4">{renderPaymentForm()}</div>
+                )}
               </div>
 
               {/* Net Banking Option */}
@@ -265,42 +434,17 @@ const PaymentOptions: React.FC<PaymentOptionsProps> = ({
                     </p>
                   </div>
                 </div>
-              </div>
-
-              {/* EMI Option */}
-              <div
-                className={`border rounded-lg p-4 ${paymentMethod === "emi" ? "border-amber-500 bg-amber-50" : ""}`}
-              >
-                <div className="flex items-start gap-3">
-                  <RadioGroupItem value="emi" id="emi" />
-                  <div>
-                    <label
-                      htmlFor="emi"
-                      className="flex items-center gap-2 cursor-pointer"
+                {paymentMethod === "netbanking" && (
+                  <div className="mt-4">
+                    <Button
+                      type="submit"
+                      className="w-full bg-amber-600 hover:bg-amber-700 text-white py-6 text-lg"
+                      onClick={handlePaymentSubmit}
                     >
-                      <div className="bg-orange-100 p-1 rounded-full">
-                        <svg
-                          xmlns="http://www.w3.org/2000/svg"
-                          width="24"
-                          height="24"
-                          viewBox="0 0 24 24"
-                          fill="none"
-                          stroke="currentColor"
-                          strokeWidth="2"
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          className="text-orange-600"
-                        >
-                          <path d="M2 17a5 5 0 0 0 10 0c0-2.5-2.5-5-5-5a5 5 0 0 0-5 5" />
-                          <path d="M12 17a5 5 0 0 0 10 0c0-2.5-2.5-5-5-5a5 5 0 0 0-5 5" />
-                        </svg>
-                      </div>
-                      <span className="font-medium">
-                        EMI (Easy Installments)
-                      </span>
-                    </label>
+                      Pay ₹{grandTotal.toFixed(2)}
+                    </Button>
                   </div>
-                </div>
+                )}
               </div>
 
               {/* Cash on Delivery Option */}
@@ -335,11 +479,11 @@ const PaymentOptions: React.FC<PaymentOptionsProps> = ({
                     </label>
                   </div>
                 </div>
+                {paymentMethod === "cod" && (
+                  <div className="mt-4">{renderPaymentForm()}</div>
+                )}
               </div>
             </RadioGroup>
-
-            {/* Render the appropriate payment form */}
-            <div className="border-t pt-6">{renderPaymentForm()}</div>
           </CardContent>
         </Card>
 
@@ -423,7 +567,7 @@ const PaymentOptions: React.FC<PaymentOptionsProps> = ({
                   </svg>
                 </div>
                 <span className="text-sm">
-                  No Cost EMI on cart value above ₹2999
+                  Secure payment with end-to-end encryption
                 </span>
               </div>
 
@@ -452,6 +596,72 @@ const PaymentOptions: React.FC<PaymentOptionsProps> = ({
           </CardContent>
         </Card>
       </div>
+
+      {/* Payment Confirmation Dialog */}
+      <Dialog open={isPaymentComplete} onOpenChange={setIsPaymentComplete}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>Payment Successful!</DialogTitle>
+            <DialogDescription>
+              Your payment has been processed successfully.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="flex flex-col items-center py-4">
+            <div className="rounded-full bg-green-100 p-3 mb-4">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="24"
+                height="24"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                className="h-8 w-8 text-green-600"
+              >
+                <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+                <polyline points="22 4 12 14.01 9 11.01"></polyline>
+              </svg>
+            </div>
+            <div className="text-center space-y-3">
+              <p className="font-medium">
+                Thank you for your order, {currentUser?.displayName || "Guest"}!
+              </p>
+              <div className="bg-gray-50 p-4 rounded-md">
+                <p className="font-medium">Payment Details:</p>
+                <p>Order ID: {orderId}</p>
+                <p>
+                  Amount Paid: ₹{(cartTotal + cartTotal * 0.05 + 9).toFixed(2)}
+                </p>
+                <p>
+                  Payment Method:{" "}
+                  {paymentMethod.charAt(0).toUpperCase() +
+                    paymentMethod.slice(1)}
+                </p>
+                <p>Payment Status: Completed</p>
+              </div>
+              <p className="text-sm text-gray-500">
+                A confirmation email has been sent to your registered email
+                address. You can track your order in the My Orders section of
+                your profile.
+              </p>
+            </div>
+          </div>
+          <div className="flex justify-center">
+            <Button
+              onClick={() => {
+                setIsPaymentComplete(false);
+                clearCart();
+                navigate("/");
+              }}
+              className="bg-amber-600 hover:bg-amber-700 text-white"
+            >
+              Continue Shopping
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };

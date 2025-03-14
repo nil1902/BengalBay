@@ -21,9 +21,16 @@ interface Order {
   date: string;
   items: OrderItem[];
   total: number;
+  subtotal: number;
+  tax: number;
+  protectFee: number;
   status: "Delivered" | "Processing" | "Shipped" | "Cancelled";
   userId?: string;
   userEmail?: string;
+  userName?: string;
+  shippingAddress?: any;
+  paymentMethod?: string;
+  paymentStatus?: string;
 }
 
 const OrderHistory = () => {
@@ -54,9 +61,21 @@ const OrderHistory = () => {
         const userOrders: Order[] = [];
 
         querySnapshot.forEach((doc) => {
-          userOrders.push({ id: doc.id, ...doc.data() } as Order);
+          const orderData = doc.data();
+          // Ensure we have the correct data structure
+          userOrders.push({
+            id: orderData.id || doc.id,
+            date: orderData.date || new Date().toISOString(),
+            items: orderData.items || [],
+            total: orderData.total || 0,
+            status: orderData.status || "Processing",
+            userId: orderData.userId || currentUser.uid,
+            userEmail: orderData.userEmail || currentUser.email,
+            ...orderData,
+          } as Order);
         });
 
+        console.log("Fetched orders:", userOrders);
         setOrders(userOrders);
       } catch (error) {
         console.error("Error fetching orders:", error);
@@ -66,6 +85,7 @@ const OrderHistory = () => {
           try {
             const parsedOrders = JSON.parse(storedOrders);
             setOrders(parsedOrders);
+            console.log("Using localStorage orders:", parsedOrders);
           } catch (err) {
             console.error("Failed to parse orders from localStorage", err);
           }
@@ -160,13 +180,43 @@ const OrderHistory = () => {
                             ₹{(item.price * item.quantity).toFixed(2)}
                           </p>
                         </div>
+                        <p className="text-xs text-gray-500">
+                          Purchased on:{" "}
+                          {new Date(
+                            item.purchaseTime || order.date,
+                          ).toLocaleString()}
+                        </p>
                       </div>
                     </div>
                   ))}
 
-                  <div className="flex justify-between pt-4">
-                    <span className="font-medium">Total</span>
-                    <span className="font-bold">₹{order.total.toFixed(2)}</span>
+                  <div className="space-y-1 pt-4">
+                    <div className="flex justify-between">
+                      <span className="text-sm">Subtotal</span>
+                      <span className="text-sm">
+                        ₹{order.subtotal?.toFixed(2) || order.total.toFixed(2)}
+                      </span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-sm">Tax (5%)</span>
+                      <span className="text-sm">
+                        ₹
+                        {order.tax?.toFixed(2) ||
+                          (order.total * 0.05).toFixed(2)}
+                      </span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-sm">Protect Fee</span>
+                      <span className="text-sm">
+                        ₹{order.protectFee?.toFixed(2) || "9.00"}
+                      </span>
+                    </div>
+                    <div className="flex justify-between pt-1 border-t">
+                      <span className="font-medium">Total</span>
+                      <span className="font-bold">
+                        ₹{order.total.toFixed(2)}
+                      </span>
+                    </div>
                   </div>
 
                   <div className="flex justify-end pt-2">

@@ -54,13 +54,15 @@ const DishCard = ({
         <Button
           variant="ghost"
           size="icon"
-          className={`absolute right-2 top-2 bg-white/80 ${isFavorite ? "text-red-600" : "text-red-500"} hover:bg-white hover:text-red-600`}
+          className={`absolute right-2 top-2 bg-white/80 ${isFavorite ? "text-red-600" : "text-red-500"} hover:bg-white hover:text-red-600 transition-transform duration-200 ${isFavorite ? "scale-110" : "hover:scale-110"}`}
           onClick={(e) => {
             e.stopPropagation();
             onFavorite(id);
           }}
         >
-          <Heart className={`h-5 w-5 ${isFavorite ? "fill-current" : ""}`} />
+          <Heart
+            className={`h-5 w-5 ${isFavorite ? "fill-current animate-pulse" : ""} transition-all duration-300 hover:scale-110`}
+          />
         </Button>
       </div>
 
