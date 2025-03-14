@@ -175,12 +175,20 @@ const ContactPage = () => {
                   <div>
                     <h3 className="text-xl font-semibold mb-2">Our Location</h3>
                     <p className="text-gray-600">
-                      123 Gourmet Street
+                      Shantipur, Landmark Station Rd
                       <br />
-                      Foodville, FV 12345
+                      PIN: 741404, Dist Nadia
                       <br />
-                      United States
+                      West Bengal, India
                     </p>
+                    <a
+                      href="https://www.google.com/maps/search/?api=1&query=Shantipur+Station+Rd+741404+West+Bengal+India"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-amber-600 hover:text-amber-800 text-sm inline-flex items-center mt-1"
+                    >
+                      View on Google Maps
+                    </a>
                   </div>
                 </div>
               </CardContent>
@@ -254,21 +262,24 @@ const ContactPage = () => {
             Find Us
           </h2>
           <div className="w-full h-[400px] bg-gray-200 rounded-lg overflow-hidden">
-            {/* In a real application, you would embed a Google Maps iframe here */}
-            <div className="w-full h-full flex items-center justify-center bg-gray-100">
-              <p className="text-gray-500">
-                Google Maps would be embedded here
-              </p>
-              {/* Example of how to embed Google Maps:
-              <iframe 
-                src="https://www.google.com/maps/embed?pb=!1m18!1m12!...your-embed-url-here" 
-                width="100%" 
-                height="100%" 
-                style={{ border: 0 }} 
-                allowFullScreen 
-                loading="lazy" 
-                referrerPolicy="no-referrer-when-downgrade"
-              ></iframe> */}
+            <div className="flex items-center justify-center h-full bg-gray-100">
+              <div className="text-center p-6">
+                <MapPin className="h-12 w-12 mx-auto text-amber-600 mb-4" />
+                <h3 className="text-xl font-semibold mb-2">Our Location</h3>
+                <p className="text-gray-600">
+                  Shantipur, Landmark Station Rd, PIN: 741404
+                  <br />
+                  Dist Nadia, West Bengal, India
+                </p>
+                <a
+                  href="https://www.google.com/maps/search/?api=1&query=Shantipur+Station+Rd+741404+West+Bengal+India"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="mt-4 inline-block px-4 py-2 bg-amber-600 text-white rounded-md hover:bg-amber-700 transition-colors"
+                >
+                  Open in Google Maps
+                </a>
+              </div>
             </div>
           </div>
         </div>

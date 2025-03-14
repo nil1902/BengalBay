@@ -23,7 +23,7 @@ const Footer = () => {
             <ul className="space-y-3">
               <li className="flex items-center gap-2">
                 <MapPin size={18} />
-                <span>123 Gourmet Street, Foodville</span>
+                <span>Shantipur, Landmark Station Rd, PIN: 741404</span>
               </li>
               <li className="flex items-center gap-2">
                 <Phone size={18} />

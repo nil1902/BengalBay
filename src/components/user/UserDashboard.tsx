@@ -36,54 +36,10 @@ const UserDashboard = () => {
   const [success, setSuccess] = useState("");
   const [loading, setLoading] = useState(false);
 
-  // Mock data for orders and bookings
-  const orders = [
-    {
-      id: "ORD-001",
-      date: "2023-06-15",
-      total: 1250,
-      status: "Delivered",
-      items: 4,
-    },
-    {
-      id: "ORD-002",
-      date: "2023-07-22",
-      total: 850,
-      status: "Delivered",
-      items: 2,
-    },
-    {
-      id: "ORD-003",
-      date: "2023-08-10",
-      total: 1650,
-      status: "Processing",
-      items: 5,
-    },
-  ];
-
-  const bookings = [
-    {
-      id: "BKG-001",
-      date: "2023-06-20",
-      time: "19:00",
-      guests: 4,
-      status: "Completed",
-    },
-    {
-      id: "BKG-002",
-      date: "2023-09-15",
-      time: "20:30",
-      guests: 2,
-      status: "Upcoming",
-    },
-    {
-      id: "BKG-003",
-      date: "2023-10-05",
-      time: "18:00",
-      guests: 6,
-      status: "Upcoming",
-    },
-  ];
+  // Empty arrays for orders and bookings for fresh accounts
+  // These will be populated from a database in a real application
+  const orders: any[] = [];
+  const bookings: any[] = [];
 
   const handleLogout = async () => {
     try {
@@ -392,9 +348,42 @@ const UserDashboard = () => {
                 <p className="text-gray-500">
                   You don't have any saved payment methods yet.
                 </p>
-                <Button className="mt-4 bg-amber-600 hover:bg-amber-700 text-white">
-                  Add Payment Method
-                </Button>
+                <div className="mt-6 space-y-4">
+                  <div className="flex flex-col items-center">
+                    <p className="font-medium mb-2">UPI Payment Options</p>
+                    <div className="flex flex-wrap justify-center gap-3 mb-4">
+                      <img
+                        src="https://upload.wikimedia.org/wikipedia/commons/thumb/e/e1/UPI-Logo-vector.svg/1200px-UPI-Logo-vector.svg.png"
+                        alt="UPI"
+                        className="h-8"
+                      />
+                      <img
+                        src="https://upload.wikimedia.org/wikipedia/commons/thumb/2/24/Paytm_Logo_%28standalone%29.svg/2560px-Paytm_Logo_%28standalone%29.svg.png"
+                        alt="Paytm"
+                        className="h-8"
+                      />
+                      <img
+                        src="https://upload.wikimedia.org/wikipedia/commons/thumb/f/f2/Google_Pay_Logo.svg/512px-Google_Pay_Logo.svg.png"
+                        alt="Google Pay"
+                        className="h-8"
+                      />
+                      <img
+                        src="https://upload.wikimedia.org/wikipedia/commons/thumb/7/71/PhonePe_Logo.svg/1200px-PhonePe_Logo.svg.png"
+                        alt="PhonePe"
+                        className="h-8"
+                      />
+                    </div>
+                    <p className="text-sm text-gray-600 mb-2">
+                      UPI ID: 8250565455@ybl
+                    </p>
+                    <p className="text-sm text-gray-600">
+                      Bank Account: 1256545835
+                    </p>
+                  </div>
+                  <Button className="mt-4 bg-amber-600 hover:bg-amber-700 text-white">
+                    Add Payment Method
+                  </Button>
+                </div>
               </div>
             </CardContent>
           </Card>

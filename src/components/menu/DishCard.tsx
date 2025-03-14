@@ -18,6 +18,7 @@ interface DishCardProps {
   rating?: number;
   category?: string;
   isSpecial?: boolean;
+  isFavorite?: boolean;
   onAddToCart?: (id: string) => void;
   onFavorite?: (id: string) => void;
 }
@@ -31,6 +32,7 @@ const DishCard = ({
   rating = 4.5,
   category = "Pasta",
   isSpecial = false,
+  isFavorite = false,
   onAddToCart = () => console.log("Add to cart clicked"), // Default handler
   onFavorite = () => {},
 }: DishCardProps) => {
@@ -45,17 +47,20 @@ const DishCard = ({
           />
         </div>
         {isSpecial && (
-          <Badge className="absolute right-2 top-2 bg-red-500 text-white">
+          <Badge className="absolute left-2 top-2 bg-red-500 text-white">
             Special
           </Badge>
         )}
         <Button
           variant="ghost"
           size="icon"
-          className="absolute right-2 top-2 bg-white/80 text-red-500 hover:bg-white hover:text-red-600"
-          onClick={() => onFavorite(id)}
+          className={`absolute right-2 top-2 bg-white/80 ${isFavorite ? "text-red-600" : "text-red-500"} hover:bg-white hover:text-red-600`}
+          onClick={(e) => {
+            e.stopPropagation();
+            onFavorite(id);
+          }}
         >
-          <Heart className="h-5 w-5" />
+          <Heart className={`h-5 w-5 ${isFavorite ? "fill-current" : ""}`} />
         </Button>
       </div>
 
@@ -85,7 +90,10 @@ const DishCard = ({
         <Button
           size="sm"
           className="bg-primary text-white hover:bg-primary/90"
-          onClick={() => onAddToCart(id)}
+          onClick={(e) => {
+            e.stopPropagation();
+            onAddToCart(id);
+          }}
           aria-label="Add to cart"
         >
           <ShoppingCart className="mr-2 h-4 w-4" />

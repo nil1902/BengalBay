@@ -144,13 +144,18 @@ const Navbar = ({ cartItemCount = 0 }: NavbarProps) => {
                   </Link>
                 </DropdownMenuItem>
                 <DropdownMenuItem asChild>
-                  <Link to="/orders" className="cursor-pointer">
+                  <Link to="/profile?tab=orders" className="cursor-pointer">
                     My Orders
                   </Link>
                 </DropdownMenuItem>
                 <DropdownMenuItem asChild>
-                  <Link to="/bookings" className="cursor-pointer">
+                  <Link to="/profile?tab=bookings" className="cursor-pointer">
                     My Bookings
+                  </Link>
+                </DropdownMenuItem>
+                <DropdownMenuItem asChild>
+                  <Link to="/profile?tab=payment" className="cursor-pointer">
+                    Payment Methods
                   </Link>
                 </DropdownMenuItem>
                 <DropdownMenuItem
@@ -252,18 +257,25 @@ const Navbar = ({ cartItemCount = 0 }: NavbarProps) => {
                     My Profile
                   </Link>
                   <Link
-                    to="/orders"
+                    to="/profile?tab=orders"
                     className="block py-2 text-gray-700 hover:text-amber-600"
                     onClick={toggleMobileMenu}
                   >
                     My Orders
                   </Link>
                   <Link
-                    to="/bookings"
+                    to="/profile?tab=bookings"
                     className="block py-2 text-gray-700 hover:text-amber-600"
                     onClick={toggleMobileMenu}
                   >
                     My Bookings
+                  </Link>
+                  <Link
+                    to="/profile?tab=payment"
+                    className="block py-2 text-gray-700 hover:text-amber-600"
+                    onClick={toggleMobileMenu}
+                  >
+                    Payment Methods
                   </Link>
                   <button
                     className="block w-full text-left py-2 text-gray-700 hover:text-amber-600"

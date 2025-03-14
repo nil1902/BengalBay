@@ -15,6 +15,7 @@ import { AuthProvider } from "./contexts/AuthContext";
 import { CartProvider } from "./components/cart/CartContext";
 
 const Profile = lazy(() => import("./pages/profile"));
+const Checkout = lazy(() => import("./pages/checkout"));
 
 function App() {
   return (
@@ -35,6 +36,7 @@ function App() {
                 <Route path="/login" element={<Login />} />
                 <Route path="/register" element={<Register />} />
                 <Route path="/profile" element={<Profile />} />
+                <Route path="/checkout" element={<Checkout />} />
                 <Route
                   path="/privacy-policy"
                   element={React.createElement(

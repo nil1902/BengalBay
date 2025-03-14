@@ -32,6 +32,7 @@ const CartDrawer: React.FC<CartDrawerProps> = ({ children }) => {
       navigate("/login");
     } else {
       // Proceed to checkout
+      setIsOpen(false);
       navigate("/checkout");
     }
   };

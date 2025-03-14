@@ -3,7 +3,7 @@ import { Separator } from "@/components/ui/separator";
 
 function TermsOfService() {
   return (
-    <div className="container mx-auto py-16 px-4">
+    <div className="container mx-auto py-16 px-4 bg-white">
       <h1 className="text-3xl font-bold mb-6">Terms of Service</h1>
       <Separator className="mb-8" />
 

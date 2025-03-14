@@ -6,12 +6,16 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Search } from "lucide-react";
 import { menuItems } from "./MenuData";
+import FoodDetailDialog from "./FoodDetailDialog";
 
 import { MenuItem } from "./MenuData";
 
 const MenuPage = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [activeTab, setActiveTab] = useState("all");
+  const [selectedDish, setSelectedDish] = useState<MenuItem | null>(null);
+  const [isDetailDialogOpen, setIsDetailDialogOpen] = useState(false);
+  const [favorites, setFavorites] = useState<string[]>([]);
 
   const filteredDishes = menuItems.filter((dish) => {
     const matchesSearch =
@@ -32,8 +36,18 @@ const MenuPage = () => {
   };
 
   const handleFavorite = (id: string) => {
-    console.log(`Added dish ${id} to favorites`);
-    // Implement favorites functionality here
+    setFavorites((prev) => {
+      if (prev.includes(id)) {
+        return prev.filter((itemId) => itemId !== id);
+      } else {
+        return [...prev, id];
+      }
+    });
+  };
+
+  const handleDishClick = (dish: MenuItem) => {
+    setSelectedDish(dish);
+    setIsDetailDialogOpen(true);
   };
 
   return (
@@ -64,7 +78,7 @@ const MenuPage = () => {
             className="w-full md:w-auto"
             onValueChange={setActiveTab}
           >
-            <TabsList className="grid grid-cols-7 w-full md:w-auto">
+            <TabsList className="grid grid-cols-8 w-full md:w-auto">
               <TabsTrigger value="all">All</TabsTrigger>
               <TabsTrigger value="veg">Vegetarian</TabsTrigger>
               <TabsTrigger value="non-veg">Non-Veg</TabsTrigger>
@@ -80,19 +94,33 @@ const MenuPage = () => {
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
           {filteredDishes.length > 0 ? (
             filteredDishes.map((dish) => (
-              <DishCard
+              <div
                 key={dish.id}
-                id={dish.id}
-                name={dish.name}
-                description={dish.description}
-                price={dish.price}
-                image={dish.image}
-                rating={dish.rating}
-                category={dish.category}
-                isSpecial={dish.isSpecial}
-                onAddToCart={handleAddToCart}
-                onFavorite={handleFavorite}
-              />
+                onClick={() => handleDishClick(dish)}
+                className="cursor-pointer"
+              >
+                <DishCard
+                  id={dish.id}
+                  name={dish.name}
+                  description={dish.description}
+                  price={dish.price}
+                  image={dish.image}
+                  rating={dish.rating}
+                  category={dish.category}
+                  isSpecial={dish.isSpecial}
+                  onAddToCart={(id) => {
+                    // Prevent the click event from bubbling up to the parent
+                    event?.stopPropagation();
+                    handleAddToCart(id);
+                  }}
+                  onFavorite={(id) => {
+                    // Prevent the click event from bubbling up to the parent
+                    event?.stopPropagation();
+                    handleFavorite(id);
+                  }}
+                  isFavorite={favorites.includes(dish.id)}
+                />
+              </div>
             ))
           ) : (
             <div className="col-span-full text-center py-10">
@@ -113,6 +141,16 @@ const MenuPage = () => {
           )}
         </div>
       </div>
+
+      {/* Food Detail Dialog */}
+      <FoodDetailDialog
+        isOpen={isDetailDialogOpen}
+        onClose={() => setIsDetailDialogOpen(false)}
+        dish={selectedDish}
+        onFavorite={(id) => {
+          handleFavorite(id);
+        }}
+      />
     </div>
   );
 };

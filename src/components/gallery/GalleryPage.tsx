@@ -192,7 +192,7 @@ const GalleryPage = () => {
           className="w-full mb-8"
           onValueChange={setActiveTab}
         >
-          <TabsList className="grid grid-cols-4 w-full max-w-md mx-auto">
+          <TabsList className="grid grid-cols-5 w-full max-w-md mx-auto">
             <TabsTrigger value="all">All</TabsTrigger>
             <TabsTrigger value="food">Food</TabsTrigger>
             <TabsTrigger value="restaurant">Restaurant</TabsTrigger>
