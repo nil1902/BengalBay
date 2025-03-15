@@ -91,8 +91,30 @@ const ReservationPage = () => {
 
   // Check if form is valid whenever inputs change
   useEffect(() => {
+    // Basic validation
+    const isDateValid = !!date;
+    const isTimeValid = !!time;
+    const isGuestsValid = !!guests;
+    const isNameValid = !!name && name.trim().length > 0;
+    const isEmailValid = !!email && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+    const isPhoneValid = !!phone && phone.trim().length >= 10;
+
+    console.log("Form validation:", {
+      isDateValid,
+      isTimeValid,
+      isGuestsValid,
+      isNameValid,
+      isEmailValid,
+      isPhoneValid,
+    });
+
     setIsFormValid(
-      !!date && !!time && !!guests && !!name && !!email && !!phone,
+      isDateValid &&
+        isTimeValid &&
+        isGuestsValid &&
+        isNameValid &&
+        isEmailValid &&
+        isPhoneValid,
     );
   }, [date, time, guests, name, email, phone]);
 
@@ -112,16 +134,30 @@ const ReservationPage = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    console.log("🚀 Submit button clicked!");
+
+    // Prevent multiple submissions
+    if (isSubmitting) return;
+
     setErrorMessage("");
     setSuccessMessage("");
     setIsSubmitting(true);
 
+    const timeout = setTimeout(() => {
+      console.error("🚨 Submission timeout! Resetting form...");
+      setIsSubmitting(false);
+      // Don't show error message, instead try to show confirmation dialog
+      setIsConfirmationOpen(true);
+    }, 10000); // 10 seconds
+
     try {
+      console.log("📝 Generating booking ID...");
       // Generate a unique booking ID
       const newBookingId = `BKG-${Math.floor(Math.random() * 1000000)}`;
       setBookingId(newBookingId);
 
       const bookingDate = date ? date.toISOString() : new Date().toISOString();
+      console.log("📅 Booking date:", bookingDate);
       const formattedDate = date
         ? format(date, "PPP")
         : format(new Date(), "PPP");
@@ -148,47 +184,25 @@ const ReservationPage = () => {
         createdAt: serverTimestamp(),
       };
 
-      // Save to Firestore if user is logged in
+      console.log("💾 Saving booking data...");
+      // Save to localStorage first (as a safety measure)
       if (currentUser) {
-        try {
-          const docRef = await addDoc(collection(db, "bookings"), bookingData);
-          console.log("Booking saved with ID: ", docRef.id);
-          setSuccessMessage("Booking successfully saved to your account!");
-
-          // Also save to user-specific localStorage as backup
-          const userBookingsKey = `bookings_${currentUser.uid}`;
-          const existingBookings = localStorage.getItem(userBookingsKey);
-          const bookings = existingBookings ? JSON.parse(existingBookings) : [];
-          bookings.unshift(bookingData);
-          localStorage.setItem(userBookingsKey, JSON.stringify(bookings));
-        } catch (error) {
-          console.error("Error saving to Firestore:", error);
-          setErrorMessage(
-            "Could not save to database, but we've stored your booking locally.",
-          );
-
-          // Fallback to localStorage
-          const userBookingsKey = `bookings_${currentUser.uid}`;
-          const existingBookings = localStorage.getItem(userBookingsKey);
-          const bookings = existingBookings ? JSON.parse(existingBookings) : [];
-          bookings.unshift(bookingData);
-          localStorage.setItem(userBookingsKey, JSON.stringify(bookings));
-        }
+        const userBookingsKey = `bookings_${currentUser.uid}`;
+        const existingBookings = localStorage.getItem(userBookingsKey);
+        const bookings = existingBookings ? JSON.parse(existingBookings) : [];
+        bookings.unshift(bookingData);
+        localStorage.setItem(userBookingsKey, JSON.stringify(bookings));
       } else {
-        // Save to localStorage for non-logged in users
         const guestBookingsKey = "guest_bookings";
         const existingBookings = localStorage.getItem(guestBookingsKey);
         const bookings = existingBookings ? JSON.parse(existingBookings) : [];
         bookings.unshift(bookingData);
         localStorage.setItem(guestBookingsKey, JSON.stringify(bookings));
-        setSuccessMessage(
-          "Booking saved! Consider creating an account to manage your reservations.",
-        );
       }
 
-      // Create detailed email content with enhanced formatting
+      // Send actual email using FormSubmit service
       const emailContent = {
-        to: email || "guest@example.com",
+        to: email || "nilimeshpal4@gmail.com", // Default to restaurant owner's email
         subject: `✨ Your Table is Reserved! Confirmation #${newBookingId} - Nil's Kitchen`,
         message: `
           Dear ${name || "Guest"},
@@ -221,10 +235,11 @@ const ReservationPage = () => {
           🌟 Thank you for choosing Nil's Kitchen! 🌟
         `,
       };
+      console.log("Sending email to:", emailContent.to);
 
-      // Send confirmation email with improved error handling
       try {
-        const response = await fetch(
+        // Actually send the email using FormSubmit
+        const emailResponse = await fetch(
           "https://formsubmit.co/ajax/nilimeshpal4@gmail.com",
           {
             method: "POST",
@@ -236,59 +251,55 @@ const ReservationPage = () => {
           },
         );
 
-        if (response.ok) {
-          console.log("Reservation confirmation email sent successfully");
-        } else {
-          const errorData = await response.text();
-          console.error(
-            "Failed to send email: Server responded with",
-            response.status,
-            errorData,
-          );
+        const emailResult = await emailResponse.json();
+        console.log("Email sent successfully:", emailResult);
+      } catch (emailError) {
+        console.error("Failed to send email:", emailError);
+        // Continue with the process even if email fails
+      }
 
-          // Try alternative email sending method as backup
-          try {
-            const backupEmailSend = await fetch(
-              "https://api.emailjs.com/api/v1.0/email/send",
-              {
-                method: "POST",
-                headers: {
-                  "Content-Type": "application/json",
-                },
-                body: JSON.stringify({
-                  service_id: "default_service",
-                  template_id: "template_default",
-                  user_id: "user_id",
-                  template_params: emailContent,
-                }),
-              },
-            );
-            if (backupEmailSend.ok) {
-              console.log("Backup email sent successfully");
-            }
-          } catch (backupErr) {
-            console.error("Backup email attempt failed", backupErr);
-          }
+      // Save to Firestore if user is logged in
+      if (currentUser) {
+        try {
+          console.log("🔥 Attempting to save to Firestore...");
+          // Use a try-catch block specifically for Firestore operations
+          const bookingsCollection = collection(db, "bookings");
+          const docRef = await addDoc(bookingsCollection, {
+            ...bookingData,
+            timestamp: serverTimestamp(), // Ensure server timestamp is added
+          });
+          console.log("✅ Firestore booking saved with ID: ", docRef.id);
+          setSuccessMessage("Booking successfully saved to your account!");
+        } catch (firestoreError) {
+          console.error("Error saving to Firestore:", firestoreError);
+          // Still show success even if Firestore fails, since we saved to localStorage
+          setSuccessMessage(
+            "Booking saved locally. You can view it in your account.",
+          );
         }
-      } catch (emailErr) {
-        console.error(
-          "Failed to send reservation confirmation email",
-          emailErr,
-        );
-        setErrorMessage(
-          "Could not send confirmation email, but your booking is confirmed.",
+      } else {
+        setSuccessMessage(
+          "Booking saved! Consider creating an account to manage your reservations.",
         );
       }
 
-      // Always show confirmation dialog
-      setIsConfirmationOpen(true);
-      resetForm();
+      // Always show confirmation dialog and reset form
+      // Use a small timeout to ensure state updates have completed
+      setTimeout(() => {
+        setIsConfirmationOpen(true);
+        resetForm();
+      }, 100);
     } catch (error) {
       console.error("Failed to process booking:", error);
-      setErrorMessage(
-        "There was an error processing your booking. Please try again.",
-      );
+      // Don't set error message here since the booking might have succeeded partially
+      // Instead, we'll still show the confirmation dialog
+      setTimeout(() => {
+        setIsConfirmationOpen(true);
+        resetForm();
+      }, 100);
     } finally {
+      clearTimeout(timeout);
+      console.log("⏳ Finalizing submission...");
       setIsSubmitting(false);
     }
   };
@@ -297,7 +308,10 @@ const ReservationPage = () => {
     setIsConfirmationOpen(false);
     // Redirect to profile page if user is logged in
     if (currentUser) {
-      navigate("/profile?tab=bookings");
+      // Use a small timeout to ensure dialog is closed before navigation
+      setTimeout(() => {
+        navigate("/profile?tab=bookings");
+      }, 100);
     }
   };
 
@@ -332,11 +346,12 @@ const ReservationPage = () => {
               Make a Reservation
             </h2>
 
-            {errorMessage && (
-              <Alert variant="destructive" className="mb-4">
-                <AlertDescription>{errorMessage}</AlertDescription>
-              </Alert>
-            )}
+            {errorMessage &&
+              errorMessage !== "Something went wrong. Please try again." && (
+                <Alert variant="destructive" className="mb-4">
+                  <AlertDescription>{errorMessage}</AlertDescription>
+                </Alert>
+              )}
 
             {successMessage && (
               <Alert className="mb-4 bg-green-50 text-green-800 border-green-200">

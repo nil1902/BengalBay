@@ -3,7 +3,16 @@ import { useAuth } from "@/contexts/AuthContext";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Calendar, Users, Clock, MapPin, ExternalLink } from "lucide-react";
+import {
+  Calendar,
+  Users,
+  Clock,
+  MapPin,
+  ExternalLink,
+  User,
+  Package,
+  CreditCard,
+} from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { collection, query, where, getDocs, orderBy } from "firebase/firestore";
 import { db } from "@/lib/firebase";
@@ -160,6 +169,47 @@ const BookingHistory = () => {
     <div className="container mx-auto py-10 px-4">
       <h1 className="text-3xl font-bold mb-6">My Bookings</h1>
 
+      {/* User Navigation Menu */}
+      <div className="mb-6 flex flex-wrap gap-2">
+        <Button
+          variant="outline"
+          className="flex items-center gap-2"
+          onClick={() => navigate("/profile")}
+        >
+          <User className="h-4 w-4" />
+          My Profile
+        </Button>
+        <Button
+          variant="outline"
+          className="flex items-center gap-2"
+          onClick={() => navigate("/profile?tab=orders")}
+        >
+          <Package className="h-4 w-4" />
+          My Orders
+        </Button>
+        <Button
+          variant="outline"
+          className="flex items-center gap-2 bg-gray-100"
+          onClick={() => navigate("/profile?tab=bookings")}
+        >
+          <Calendar className="h-4 w-4" />
+          My Bookings
+        </Button>
+        <Button
+          variant="outline"
+          className="flex items-center gap-2"
+          onClick={() => navigate("/profile?tab=payment")}
+        >
+          <CreditCard className="h-4 w-4" />
+          Payment Methods
+        </Button>
+      </div>
+
+      <div className="mb-6">
+        <h2 className="text-2xl font-semibold mb-4">
+          Your Reservations History
+        </h2>
+      </div>
       {bookings.length === 0 ? (
         <div className="text-center py-8">
           <Calendar className="h-12 w-12 mx-auto text-gray-400 mb-4" />

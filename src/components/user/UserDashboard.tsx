@@ -22,6 +22,7 @@ import {
   LogOut,
   Edit2,
   Save,
+  Plus,
 } from "lucide-react";
 
 const UserDashboard = () => {
@@ -204,17 +205,30 @@ const UserDashboard = () => {
             </CardHeader>
             <CardContent>
               {orders.length === 0 ? (
-                <div className="text-center py-8">
-                  <Package className="h-12 w-12 mx-auto text-gray-400 mb-4" />
-                  <p className="text-gray-500">
-                    You haven't placed any orders yet.
-                  </p>
-                  <Button
-                    className="mt-4 bg-amber-600 hover:bg-amber-700 text-white"
-                    onClick={() => navigate("/menu")}
-                  >
-                    Browse Menu
-                  </Button>
+                <div className="flex justify-center space-x-8 py-8">
+                  {/* New Orders */}
+                  <div className="text-center">
+                    <Package className="h-12 w-12 mx-auto text-gray-400 mb-4" />
+                    <p className="text-gray-500">New Orders</p>
+                    <Button
+                      className="mt-4 bg-amber-600 hover:bg-amber-700 text-white"
+                      onClick={() => navigate("/menu")}
+                    >
+                      Browse Menu
+                    </Button>
+                  </div>
+
+                  {/* Order History */}
+                  <div className="text-center">
+                    <Package className="h-12 w-16 mx-auto text-gray-400 mb-4" />
+                    <p className="text-gray-500">Order History</p>
+                    <Button
+                      className="mt-4 bg-amber-600 hover:bg-amber-700 text-white"
+                      onClick={() => navigate("/profile?tab=orders")}
+                    >
+                      My Orders
+                    </Button>
+                  </div>
                 </div>
               ) : (
                 <div className="space-y-4">
@@ -267,17 +281,30 @@ const UserDashboard = () => {
             </CardHeader>
             <CardContent>
               {bookings.length === 0 ? (
-                <div className="text-center py-8">
-                  <Calendar className="h-12 w-12 mx-auto text-gray-400 mb-4" />
-                  <p className="text-gray-500">
-                    You don't have any reservations yet.
-                  </p>
-                  <Button
-                    className="mt-4 bg-amber-600 hover:bg-amber-700 text-white"
-                    onClick={() => navigate("/reservations")}
-                  >
-                    Book a Table
-                  </Button>
+                <div className="flex justify-center space-x-8 py-8">
+                  {/* Make New Reservations */}
+                  <div className="text-center">
+                    <Calendar className="h-12 w-12 mx-auto text-gray-400 mb-4" />
+                    <p className="text-gray-500">New reservations.</p>
+                    <Button
+                      className="mt-4 bg-amber-600 hover:bg-amber-700 text-white"
+                      onClick={() => navigate("/reservations")}
+                    >
+                      Book a Table
+                    </Button>
+                  </div>
+
+                  {/* Booking History */}
+                  <div className="text-center">
+                    <Calendar className="h-12 w-12 mx-auto text-gray-400 mb-4" />
+                    <p className="text-gray-500">Booking History</p>
+                    <Button
+                      className="mt-4 bg-amber-600 hover:bg-amber-700 text-white"
+                      onClick={() => navigate("/profile?tab=bookings")}
+                    >
+                      My Booking
+                    </Button>
+                  </div>
                 </div>
               ) : (
                 <div className="space-y-4">
@@ -343,46 +370,109 @@ const UserDashboard = () => {
               <CardDescription>Manage your payment options</CardDescription>
             </CardHeader>
             <CardContent>
-              <div className="text-center py-8">
-                <CreditCard className="h-12 w-12 mx-auto text-gray-400 mb-4" />
-                <p className="text-gray-500">
-                  You don't have any saved payment methods yet.
+              <div className="text-center py-3 ">
+                <CreditCard className="h-12 w-12 mx-auto text-gray-400 mb-6 " />
+                <p className="text-gray-500 mb-4">
+                  Paying attention costs you nothing, but not paying attention
+                  could cost you everything.
                 </p>
-                <div className="mt-6 space-y-4">
-                  <div className="flex flex-col items-center">
-                    <p className="font-medium mb-2">UPI Payment Options</p>
-                    <div className="flex flex-wrap justify-center gap-3 mb-4">
-                      <img
-                        src="https://upload.wikimedia.org/wikipedia/commons/thumb/e/e1/UPI-Logo-vector.svg/1200px-UPI-Logo-vector.svg.png"
-                        alt="UPI"
-                        className="h-8"
-                      />
-                      <img
-                        src="https://upload.wikimedia.org/wikipedia/commons/thumb/2/24/Paytm_Logo_%28standalone%29.svg/2560px-Paytm_Logo_%28standalone%29.svg.png"
-                        alt="Paytm"
-                        className="h-8"
-                      />
-                      <img
-                        src="https://upload.wikimedia.org/wikipedia/commons/thumb/f/f2/Google_Pay_Logo.svg/512px-Google_Pay_Logo.svg.png"
-                        alt="Google Pay"
-                        className="h-8"
-                      />
-                      <img
-                        src="https://upload.wikimedia.org/wikipedia/commons/thumb/7/71/PhonePe_Logo.svg/1200px-PhonePe_Logo.svg.png"
-                        alt="PhonePe"
-                        className="h-8"
-                      />
+                <div className="w-full max-w-md mx-auto">
+                  <div className="bg-amber-50 p-6 rounded-lg border border-amber-200 mb-8">
+                    <h3 className="text-xl font-semibold text-center mb-6">
+                      We Accept
+                    </h3>
+                    <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                      <div className="flex flex-col items-center">
+                        <img
+                          src="https://upload.wikimedia.org/wikipedia/commons/thumb/e/e1/UPI-Logo-vector.svg/1200px-UPI-Logo-vector.svg.png"
+                          alt="UPI"
+                          className="h-10 object-contain mb-2"
+                        />
+                        <span className="text-xs text-gray-600">UPI</span>
+                      </div>
+                      <div className="flex flex-col items-center">
+                        <img
+                          src="https://upload.wikimedia.org/wikipedia/commons/thumb/2/24/Paytm_Logo_%28standalone%29.svg/2560px-Paytm_Logo_%28standalone%29.svg.png"
+                          alt="Paytm"
+                          className="h-10 object-contain mb-2"
+                        />
+                        <span className="text-xs text-gray-600">Paytm</span>
+                      </div>
+                      <div className="flex flex-col items-center">
+                        <img
+                          src="https://upload.wikimedia.org/wikipedia/commons/thumb/f/f2/Google_Pay_Logo.svg/512px-Google_Pay_Logo.svg.png"
+                          alt="Google Pay"
+                          className="h-10 object-contain mb-2"
+                        />
+                        <span className="text-xs text-gray-600">
+                          Google Pay
+                        </span>
+                      </div>
+                      <div className="flex flex-col items-center">
+                        <img
+                          src="https://upload.wikimedia.org/wikipedia/commons/thumb/7/71/PhonePe_Logo.svg/1200px-PhonePe_Logo.svg.png"
+                          alt="PhonePe"
+                          className="h-10 object-contain mb-2"
+                        />
+                        <span className="text-xs text-gray-600">PhonePe</span>
+                      </div>
+                      <div className="flex flex-col items-center">
+                        <img
+                          src="https://upload.wikimedia.org/wikipedia/commons/thumb/0/0c/MasterCard_logo.png/640px-MasterCard_logo.png"
+                          alt="MasterCard"
+                          className="h-10 object-contain mb-2"
+                        />
+                        <span className="text-xs text-gray-600">
+                          MasterCard
+                        </span>
+                      </div>
+                      <div className="flex flex-col items-center">
+                        <img
+                          src="https://upload.wikimedia.org/wikipedia/commons/thumb/5/5e/Visa_Inc._logo.svg/1200px-Visa_Inc._logo.svg.png"
+                          alt="Visa"
+                          className="h-10 object-contain mb-2"
+                        />
+                        <span className="text-xs text-gray-600">Visa</span>
+                      </div>
+                      <div className="flex flex-col items-center">
+                        <img
+                          src="https://upload.wikimedia.org/wikipedia/commons/thumb/f/fa/American_Express_logo_%282018%29.svg/1200px-American_Express_logo_%282018%29.svg.png"
+                          alt="American Express"
+                          className="h-10 object-contain mb-2"
+                        />
+                        <span className="text-xs text-gray-600">Amex</span>
+                      </div>
+                      <div className="flex flex-col items-center">
+                        <img
+                          src="https://upload.wikimedia.org/wikipedia/commons/thumb/d/d1/RuPay.svg/1200px-RuPay.svg.png"
+                          alt="RuPay"
+                          className="h-10 object-contain mb-2"
+                        />
+                        <span className="text-xs text-gray-600">RuPay</span>
+                      </div>
                     </div>
-                    <p className="text-sm text-gray-600 mb-2">
-                      UPI ID: 8250565455@ybl
-                    </p>
-                    <p className="text-sm text-gray-600">
-                      Bank Account: 1256545835
-                    </p>
                   </div>
-                  <Button className="mt-4 bg-amber-600 hover:bg-amber-700 text-white">
-                    Add Payment Method
-                  </Button>
+
+                  <div className="text-centre  mx-30">
+                    <div className="mb-4">
+                      <p className="text-sm text-gray-600 mb-2">
+                        UPI ID: 8250565455@ybl
+                      </p>
+                      <p className="text-sm text-gray-600 mb-2">
+                        Bank Account: 1256545835
+                      </p>
+                      <p className="text-sm text-gray-600 ">
+                        IFSC CODE: SBIN0006
+                      </p>
+                    </div>
+                    <Button
+                      className="bg-amber-600 hover:bg-amber-700 text-white"
+                      onClick={() => navigate("/checkout")}
+                    >
+                      <Plus className="mr-2 h-4 w-4" />
+                      Make Payment
+                    </Button>
+                  </div>
                 </div>
               </div>
             </CardContent>

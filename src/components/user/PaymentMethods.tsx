@@ -1,7 +1,7 @@
 import React from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { CreditCard, Plus } from "lucide-react";
+import { CreditCard, Plus, User, Package, Calendar } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 
 const PaymentMethods = () => {
@@ -9,6 +9,19 @@ const PaymentMethods = () => {
   return (
     <div className="container mx-auto py-10 px-4">
       <h1 className="text-3xl font-bold mb-6">Payment Methods</h1>
+
+      {/* User Navigation Menu */}
+      <div className="mb-6 flex flex-wrap gap-2">
+        <Button
+          variant="outline"
+          className="flex items-center gap-2 bg-gray-100"
+          onClick={() => navigate("/profile?tab=payment")}
+        >
+          <CreditCard className="h-4 w-4" />
+          Payment Methods
+        </Button>
+      </div>
+
       <Card>
         <CardHeader>
           <CardTitle>Manage your payment options</CardTitle>
@@ -17,7 +30,7 @@ const PaymentMethods = () => {
           <div className="flex flex-col items-center justify-center py-12">
             <CreditCard className="h-16 w-16 text-gray-300 mb-4" />
             <p className="text-gray-500 mb-6">
-              You don't have any saved payment methods yet.
+              Price is what you pay, Value is what you get.
             </p>
 
             <div className="w-full max-w-md">
@@ -94,14 +107,6 @@ const PaymentMethods = () => {
               </div>
 
               <div className="text-center">
-                <div className="mb-4">
-                  <p className="text-sm text-gray-600 mb-2">
-                    UPI ID: 8250565455@ybl
-                  </p>
-                  <p className="text-sm text-gray-600">
-                    Bank Account: 1256545835
-                  </p>
-                </div>
                 <Button
                   className="bg-amber-600 hover:bg-amber-700 text-white"
                   onClick={() => navigate("/checkout")}
