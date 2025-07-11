@@ -1,5 +1,6 @@
 {
   "name": "nil-s-kitchen",
+  "homepage": "https://c-met.github.io/BengalBay/",
   "private": true,
   "version": "0.1.0",
   "type": "module",
@@ -12,7 +13,9 @@
     "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
     "preview": "vite preview",
     "analyze": "vite build --mode production && npx vite-bundle-analyzer dist",
-    "types:supabase": "npx supabase gen types typescript --project-id $SUPABASE_PROJECT_ID > src/types/supabase.ts"
+    "types:supabase": "npx supabase gen types typescript --project-id $SUPABASE_PROJECT_ID > src/types/supabase.ts",
+    "predeploy": "npm run build",
+    "deploy": "gh-pages -d dist"
   },
   "dependencies": {
     "@hookform/resolvers": "^3.6.0",
@@ -52,6 +55,7 @@
     "embla-carousel-react": "^8.1.5",
     "firebase": "^11.4.0",
     "framer-motion": "^11.18.0",
+    "gh-pages": "^6.3.0",
     "lucide-react": "^0.394.0",
     "react": "^18.2.0",
     "react-day-picker": "^8.10.1",
