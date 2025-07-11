@@ -12,7 +12,7 @@ interface HeroBannerProps {
 const HeroBanner = ({
   title = "Welcome to Bengal Bay",
   subtitle = "Experience authentic flavors with our handcrafted dishes made from the freshest ingredients.",
-  imageUrl = "/assets/images/home/p1.webp",
+  imageUrl = "./assets/images/home/p1.webp",
 }: HeroBannerProps) => {
   return (
     <div className="relative w-full h-screen bg-slate-900 overflow-hidden">

@@ -24,8 +24,8 @@ export const preloadImage = (src: string): Promise<void> => {
 
 export const preloadCriticalImages = async () => {
   const criticalImages = [
-    '/assets/images/home/p1.webp',
-    '/assets/images/logo/bengal-bay.png',
+      './assets/images/home/p1.webp',
+  './assets/images/logo/bengal-bay.png',
   ];
   
   try {

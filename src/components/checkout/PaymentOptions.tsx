@@ -218,7 +218,7 @@ const PaymentOptions: React.FC<PaymentOptionsProps> = ({
         return (
           <div className="flex flex-col items-center gap-4 py-4">
             <img
-              src="/assets/images/QR.webp"
+              src="./assets/images/QR.webp"
               alt="Scan to pay via UPI"
               className="h-40 w-40 object-contain border rounded-lg shadow"
             />

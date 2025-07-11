@@ -32,7 +32,7 @@ const Logo: React.FC<LogoProps> = ({
     >
       <div className="flex items-center">
         <img
-          src="/assets/images/logo/nils-kitchen-logo.svg"
+          src="./assets/images/logo/nils-kitchen-logo.svg"
           alt="Bengal Bay Logo"
           className={`h-auto ${size === "sm" ? "w-24" : size === "md" ? "w-32" : "w-40"}`}
         />

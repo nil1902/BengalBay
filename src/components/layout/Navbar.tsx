@@ -79,7 +79,7 @@ const Navbar = ({ cartItemCount = 0, isLandingPage = false }: NavbarProps) => {
           {/* Logo */}
           <Link to="/" className="flex items-center group">
             <img
-              src="/assets/images/logo/bengal-bay.png"
+              src="./assets/images/logo/bengal-bay.png"
               alt="Bengal Bay Logo"
               className="h-10 w-auto transition-all duration-300 group-hover:scale-110 group-hover:drop-shadow-lg"
             />
