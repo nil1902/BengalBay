@@ -2,6 +2,7 @@ import React from "react";
 import { Button } from "@/components/ui/button";
 import { ArrowRight } from "lucide-react";
 import Navbar from "@/components/layout/Navbar";
+import { useNavigate } from "react-router-dom";
 
 interface HeroBannerProps {
   title?: string;
@@ -14,6 +15,16 @@ const HeroBanner = ({
   subtitle = "Experience authentic flavors with our handcrafted dishes made from the freshest ingredients.",
   imageUrl = "./assets/images/home/p1.webp",
 }: HeroBannerProps) => {
+  const navigate = useNavigate();
+
+  const handleBookTable = () => {
+    navigate("/reservations");
+  };
+
+  const handleOrderOnline = () => {
+    navigate("/menu");
+  };
+
   return (
     <div className="relative w-full h-screen bg-slate-900 overflow-hidden">
       <Navbar isLandingPage={true} />
@@ -37,14 +48,14 @@ const HeroBanner = ({
           <Button
             size="lg"
             className="bg-gradient-to-r from-amber-500 to-amber-700 text-white shadow-lg hover:from-amber-600 hover:to-amber-800 transition-all duration-200"
-            onClick={() => (window.location.href = "/reservations")}
+            onClick={handleBookTable}
           >
             Book a Table
           </Button>
           <Button
             size="lg"
             className="bg-white text-amber-700 font-bold shadow-lg hover:bg-amber-100 transition-all duration-200 border border-amber-600"
-            onClick={() => (window.location.href = "/menu")}
+            onClick={handleOrderOnline}
           >
             Order Online <ArrowRight className="ml-2 h-4 w-4" />
           </Button>

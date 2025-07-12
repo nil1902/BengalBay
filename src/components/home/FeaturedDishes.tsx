@@ -3,6 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { ChevronLeft, ChevronRight, Star, StarHalf, Star as StarOutline } from "lucide-react";
 import DishCard from "../menu/DishCard";
+import { useNavigate } from "react-router-dom";
 
 interface Dish {
   id: string;
@@ -127,6 +128,7 @@ const FeaturedDishes = ({
 }: FeaturedDishesProps) => {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [itemsPerView, setItemsPerView] = useState(4);
+  const navigate = useNavigate();
 
   useEffect(() => {
     const updateItemsPerView = () => {
@@ -148,6 +150,10 @@ const FeaturedDishes = ({
 
   const handleNext = () => {
     setCurrentIndex((prev) => Math.min(maxIndex, prev + 1));
+  };
+
+  const handleViewFullMenu = () => {
+    navigate("/menu");
   };
 
   return (
@@ -235,7 +241,7 @@ const FeaturedDishes = ({
         <div className="mt-10 text-center">
           <Button
             className="bg-amber-600 text-white hover:bg-amber-700"
-            onClick={() => (window.location.href = "/menu")}
+            onClick={handleViewFullMenu}
           >
             View Full Menu
           </Button>

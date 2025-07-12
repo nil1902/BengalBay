@@ -37,7 +37,7 @@ import {
 import { useAuth } from "@/contexts/AuthContext";
 import { collection, addDoc, serverTimestamp } from "firebase/firestore";
 import { db } from "@/lib/firebase";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 
 const timeSlots = [
@@ -500,16 +500,16 @@ const ReservationPage = () => {
 
               {!currentUser && (
                 <p className="text-sm text-gray-500 text-center mt-2">
-                  <a href="/login" className="text-amber-600 hover:underline">
+                  <Link to="/login" className="text-amber-600 hover:underline">
                     Sign in
-                  </a>{" "}
+                  </Link>{" "}
                   or{" "}
-                  <a
-                    href="/register"
+                  <Link
+                    to="/register"
                     className="text-amber-600 hover:underline"
                   >
                     create an account
-                  </a>{" "}
+                  </Link>{" "}
                   to manage your reservations
                 </p>
               )}

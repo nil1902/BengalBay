@@ -11,6 +11,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import NewsletterForm from "@/components/home/NewsletterForm";
+import { Link } from "react-router-dom";
 
 const Footer = () => {
   return (
@@ -62,52 +63,52 @@ const Footer = () => {
             <h3 className="text-xl font-bold mb-4">Quick Links</h3>
             <ul className="space-y-2">
               <li>
-                <a
-                  href="/menu"
+                <Link
+                  to="/menu"
                   className="hover:text-amber-400 transition-colors"
                 >
                   Menu
-                </a>
+                </Link>
               </li>
               <li>
-                <a
-                  href="/reservations"
+                <Link
+                  to="/reservations"
                   className="hover:text-amber-400 transition-colors"
                 >
                   Reservations
-                </a>
+                </Link>
               </li>
               <li>
-                <a
-                  href="/about"
+                <Link
+                  to="/about"
                   className="hover:text-amber-400 transition-colors"
                 >
                   About Us
-                </a>
+                </Link>
               </li>
               <li>
-                <a
-                  href="/contact"
+                <Link
+                  to="/contact"
                   className="hover:text-amber-400 transition-colors"
                 >
                   Contact
-                </a>
+                </Link>
               </li>
               <li>
-                <a
-                  href="/privacy-policy"
+                <Link
+                  to="/privacy-policy"
                   className="hover:text-amber-400 transition-colors"
                 >
                   Privacy Policy
-                </a>
+                </Link>
               </li>
               <li>
-                <a
-                  href="/terms-of-service"
+                <Link
+                  to="/terms-of-service"
                   className="hover:text-amber-400 transition-colors"
                 >
                   Terms of Service
-                </a>
+                </Link>
               </li>
             </ul>
           </div>
@@ -161,18 +162,18 @@ const Footer = () => {
               Design by Soumik & Nilimesh
             </p>
           <div className="flex gap-4 mt-4 md:mt-0">
-            <a
-              href="/privacy-policy"
+            <Link
+              to="/privacy-policy"
               className="text-gray-400 hover:text-amber-400 text-sm transition-colors"
             >
               Privacy Policy
-            </a>
-            <a
-              href="/terms-of-service"
+            </Link>
+            <Link
+              to="/terms-of-service"
               className="text-gray-400 hover:text-amber-400 text-sm transition-colors"
             >
               Terms of Service
-            </a>
+            </Link>
           </div>
         </div>
         

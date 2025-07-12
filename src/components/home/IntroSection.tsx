@@ -1,5 +1,6 @@
 import React from "react";
 import { Separator } from "../ui/separator";
+import { useNavigate } from "react-router-dom";
 
 interface IntroSectionProps {
   title?: string;
@@ -16,6 +17,12 @@ const IntroSection = ({
   chefDescription = "With over 5 years of culinary expertise, Chef Nilesh brings his unique vision and passion to every dish, combining traditional techniques with innovative flavors.",
   restaurantHistory = "Established in 2020, Bengal Bay began as a small family restaurant and has grown into one of the city's most beloved dining destinations, known for our commitment to quality ingredients and authentic flavors.",
 }: IntroSectionProps) => {
+  const navigate = useNavigate();
+
+  const handleLearnMore = () => {
+    navigate("/about");
+  };
+
   return (
     <section className="w-full max-w-7xl mx-auto py-16 px-4 sm:px-6 lg:px-8 bg-white">
       <div className="text-center mb-12 animate-fade-in">
@@ -44,12 +51,12 @@ const IntroSection = ({
           </h3>
           <p className="text-gray-600">{chefDescription}</p>
           <div className="pt-4">
-            <a
-              href="/about"
-              className="text-amber-600 hover:text-amber-700 font-medium inline-block"
+            <button
+              onClick={handleLearnMore}
+              className="text-amber-600 hover:text-amber-700 font-medium inline-block cursor-pointer"
             >
               Learn more about our team →
-            </a>
+            </button>
           </div>
         </div>
 
@@ -68,12 +75,12 @@ const IntroSection = ({
           </h3>
           <p className="text-gray-600">{restaurantHistory}</p>
           <div className="pt-4">
-            <a
-              href="/about"
-              className="text-amber-600 hover:text-amber-700 font-medium inline-block"
+            <button
+              onClick={handleLearnMore}
+              className="text-amber-600 hover:text-amber-700 font-medium inline-block cursor-pointer"
             >
               Read our full story →
-            </a>
+            </button>
           </div>
         </div>
       </div>
