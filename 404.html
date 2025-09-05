@@ -1,7 +1,23 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <meta http-equiv="refresh" content="0; url=/" />
+    <meta charset="utf-8" />
+    <title>Redirecting...</title>
+    <script>
+      // Detect base path for GitHub Pages or root for custom domains
+      var pathSegments = window.location.pathname.split('/').filter(Boolean);
+      var base = pathSegments.length > 0 ? pathSegments[0] : '';
+      var redirectPath = window.location.pathname + window.location.search + window.location.hash;
+      var target;
+      if (base && window.location.hostname.endsWith('github.io')) {
+        // For GitHub Pages subfolder deployment
+        target = '/' + base + '/?redirect=' + encodeURIComponent(redirectPath);
+      } else {
+        // For root domain or custom domain deployment
+        target = '/?redirect=' + encodeURIComponent(redirectPath);
+      }
+      window.location.replace(target);
+    </script>
   </head>
   <body>
     <p>Redirecting...</p>
